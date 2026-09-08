@@ -99,8 +99,10 @@ The script:
 - Skips any article whose PDF passes a basic header/end-marker check at
   `pdfs/<category>/<id>.pdf` (delete the file to force a re-archive).
 - Uses Playwright (headless Chromium) to render HTML pages to PDF.
-- Downloads URLs ending in `.pdf` directly via `fetch`, validating the
-  `application/pdf` content-type and the `%PDF-` signature.
+- Detects PDF responses by their `application/pdf` content-type, including
+  download links without a `.pdf` ending and redirects. Downloads must pass
+  the PDF header/end-marker check. A 60-second deadline covers response headers
+  and the full download; timeouts are logged for manual recovery.
 - Writes a summary to `archive-report.json` with one entry per article and a
   `status` of `success`, `skipped`, `blocked` (HTTP 401/403), or `failed`.
 

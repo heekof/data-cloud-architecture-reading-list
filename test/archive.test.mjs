@@ -123,3 +123,52 @@ test('invalid entries and colliding paths fail before archiving with actionable 
     }
   } finally { await fs.rm(root, { recursive: true, force: true }); }
 });
+
+test('extensionless and redirected PDF downloads are archived directly', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'archive-test-'));
+  const pdf = '%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n';
+  const server = http.createServer((req, res) => {
+    if (req.url === '/redirect') { res.writeHead(302, { location: '/download?id=123' }); res.end(); return; }
+    res.writeHead(200, { 'content-type': 'application/pdf', 'content-disposition': 'attachment; filename="article.pdf"' });
+    res.end(pdf);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    await fs.writeFile(path.join(root, 'articles.yaml'), JSON.stringify({ articles:
+      ['/download?id=123', '/redirect'].map((url, i) => ({ id: `pdf-${i}`, title: 'PDF', category: 'test', url: base + url }))
+    }));
+    const result = await run(root);
+    assert.equal(result.code, 0, result.output);
+    const report = JSON.parse(await fs.readFile(path.join(root, 'archive-report.json'), 'utf8'));
+    assert.ok(report.every(item => item.status === 'success' && item.captureMethod === 'direct-download'));
+    for (const item of report) assert.equal(await fs.readFile(path.join(root, item.output), 'utf8'), pdf);
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
+  }
+});
+
+test('download deadline covers stalled headers and a continuously streaming body', async () => {
+  const { fetchPdfBuffer } = await import('../src/archive-support.mjs');
+  const server = http.createServer((req, res) => {
+    if (req.url === '/headers.pdf') return;
+    if (req.url === '/page') { res.writeHead(200, { 'content-type': 'text/html' }); res.end('<h1>Article</h1>'); return; }
+    res.writeHead(200, { 'content-type': 'application/pdf' });
+    res.write('%PDF-1.4\n');
+    const timer = setInterval(() => res.write('still sending\n'), 20);
+    res.on('close', () => clearInterval(timer));
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    for (const url of ['/headers.pdf', '/stream.pdf']) {
+      await assert.rejects(fetchPdfBuffer(base + url, { required: true, timeoutMs: 150 }), /Download timed out after 150 ms/);
+    }
+    assert.equal(await fetchPdfBuffer(base + '/page'), null, 'HTML must still go to the browser');
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+  }
+});

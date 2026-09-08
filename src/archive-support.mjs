@@ -61,3 +61,32 @@ export async function writeManualTasks(root, articles, report) {
   await fs.writeFile(path.join(root, "manual-tasks-todo-for-me.md"), lines.join("\n"));
   return count;
 }
+
+// The deadline covers redirects, response headers, and the entire response body.
+export async function fetchPdfBuffer(url, { required = false, timeoutMs = 60000 } = {}) {
+  const signal = AbortSignal.timeout(timeoutMs);
+  let response;
+  try {
+    response = await fetch(url, { signal });
+    const contentType = response.headers.get("content-type") || "";
+    const isPdf = contentType.toLowerCase().split(";")[0].trim() === "application/pdf";
+    // Leave HTML responses (including browser challenges) to Playwright.
+    if (!isPdf && !required) return null;
+    if (!response.ok) {
+      const error = new Error(`HTTP ${response.status} ${response.statusText}`);
+      error.httpStatus = response.status;
+      throw error;
+    }
+    if (!isPdf) throw new Error(`Expected a PDF but received: ${contentType || "unknown content type"}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (!isCompletePdf(buffer)) {
+      throw new Error("Downloaded content failed the PDF completeness check (missing %PDF- header or %%EOF end marker).");
+    }
+    return buffer;
+  } catch (error) {
+    if (signal.aborted) throw new Error(`Download timed out after ${timeoutMs} ms: ${url}`);
+    throw error;
+  } finally {
+    if (response?.body && !response.bodyUsed) await response.body.cancel().catch(() => {});
+  }
+}

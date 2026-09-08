@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { chromium } from "playwright";
 import YAML from "yaml";
-import { isCompletePdf, inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
+import { fetchPdfBuffer, inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
 
 const ROOT = process.cwd();
 const CONFIG_PATH = path.join(ROOT, "articles.yaml");
@@ -211,7 +211,7 @@ async function getHttpErrorDetails(page, response) {
   return details.join(" | ");
 }
 
-async function downloadDirectPdf(article) {
+async function downloadDirectPdf(article, buffer) {
   const id = sanitizeSegment(
     article.id || article.title,
   );
@@ -236,34 +236,6 @@ async function downloadDirectPdf(article) {
 
   console.log(`Downloading PDF: ${article.title || id}`);
   console.log(`  URL: ${article.url}`);
-
-  const response = await fetch(article.url);
-
-  if (!response.ok) {
-    const error = new Error(
-      `HTTP ${response.status} ${response.statusText}`,
-    );
-
-    error.httpStatus = response.status;
-    throw error;
-  }
-
-  const contentType =
-    response.headers.get("content-type") || "";
-
-  if (!contentType.toLowerCase().includes("application/pdf")) {
-    throw new Error(
-      `Expected a PDF but received: ${contentType || "unknown content type"}`,
-    );
-  }
-
-  const buffer = Buffer.from(
-    await response.arrayBuffer(),
-  );
-
-  if (!isCompletePdf(buffer)) {
-    throw new Error("Downloaded content failed the PDF completeness check (missing %PDF- header or %%EOF end marker).");
-  }
 
   await fs.writeFile(outputPath, buffer);
 
@@ -536,11 +508,13 @@ async function main() {
           article.url,
         ).pathname.toLowerCase().endsWith(".pdf");
 
-        if (!isDirectPdf && !browser) {
+        await fs.mkdir(path.dirname(outputPath), { recursive: true });
+        const pdfBuffer = await fetchPdfBuffer(article.url, { required: isDirectPdf });
+        if (!pdfBuffer && !browser) {
           browser = await chromium.launch({ headless: true });
         }
-        const result = isDirectPdf
-          ? await downloadDirectPdf(article)
+        const result = pdfBuffer
+          ? await downloadDirectPdf(article, pdfBuffer)
           : await archiveArticle(browser, article);
 
         report.push(result);
