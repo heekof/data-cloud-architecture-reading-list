@@ -1,6 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+export function isCompletePdf(buffer) {
+  // Basic completeness check, not a guarantee that the captured article is correct.
+  return buffer.subarray(0, 5).toString() === "%PDF-" &&
+    buffer.subarray(-1024).includes(Buffer.from("%%EOF"));
+}
+
 export async function inspectPdf(filename) {
   let buffer;
   try {
@@ -11,8 +17,7 @@ export async function inspectPdf(filename) {
   }
   return {
     exists: true,
-    // Basic completeness check, not a guarantee that the captured article is correct.
-    valid: buffer.subarray(0, 5).toString() === "%PDF-" && buffer.subarray(-1024).includes(Buffer.from("%%EOF")),
+    valid: isCompletePdf(buffer),
     stats: await fs.stat(filename),
   };
 }

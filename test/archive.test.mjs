@@ -71,3 +71,55 @@ test('configuration failures create a persistent log and a manual task', async (
     assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /Archive run could not finish/);
   } finally { await fs.rm(root, { recursive: true, force: true }); }
 });
+
+test('incomplete downloads fail and can be retried with a complete small PDF', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'archive-test-'));
+  let body = '%PDF-1.4\n' + 'x'.repeat(11000);
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'application/pdf' });
+    res.end(body);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    await fs.writeFile(path.join(root, 'articles.yaml'), JSON.stringify({ articles: [
+      { id: 'download', title: 'Download', category: 'test', url: `http://127.0.0.1:${server.address().port}/article.pdf` },
+    ] }));
+    assert.equal((await run(root)).code, 1);
+    const report = JSON.parse(await fs.readFile(path.join(root, 'archive-report.json'), 'utf8'));
+    assert.equal(report[0].status, 'failed');
+    assert.match(await fs.readFile(path.join(root, 'archive-issues.log'), 'utf8'), /completeness check/);
+    assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /- \[ \] \*\*Download/);
+    await assert.rejects(fs.access(path.join(root, 'pdfs/test/download.pdf')), { code: 'ENOENT' });
+    body = '%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n';
+    assert.equal((await run(root)).code, 0);
+    assert.equal(await fs.readFile(path.join(root, 'pdfs/test/download.pdf'), 'utf8'), body);
+    assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /No manual downloads pending/);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
+  }
+});
+
+test('invalid entries and colliding paths fail before archiving with actionable errors', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'archive-test-'));
+  const article = { id: 'same-id', title: 'Example', category: 'test', url: 'http://127.0.0.1:1/example.pdf' };
+  const cases = [
+    { articles: [null, article], message: /Article 1 must be an object/ },
+    { articles: [article, { ...article, id: 'Same ID' }], message: /same PDF path/ },
+    { articles: [article, { ...article }], message: /same PDF path/ },
+    { articles: [{ ...article, category: '..' }], message: /invalid id or category/ },
+  ];
+  try {
+    for (const fixture of cases) {
+      await fs.writeFile(path.join(root, 'articles.yaml'), JSON.stringify({ articles: fixture.articles }));
+      const result = await run(root);
+      assert.equal(result.code, 1);
+      assert.match(result.output, fixture.message);
+      assert.doesNotMatch(result.output, /Cannot read properties/);
+      const log = (await fs.readFile(path.join(root, 'archive-issues.log'), 'utf8')).trim().split('\n').map(JSON.parse);
+      assert.match(log.at(-1).error, fixture.message);
+      assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), fixture.message);
+      await assert.rejects(fs.access(path.join(root, 'pdfs')), { code: 'ENOENT' });
+    }
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
+});

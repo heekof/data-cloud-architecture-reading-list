@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { chromium } from "playwright";
 import YAML from "yaml";
-import { inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
+import { isCompletePdf, inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
 
 const ROOT = process.cwd();
 const CONFIG_PATH = path.join(ROOT, "articles.yaml");
@@ -43,6 +43,32 @@ async function readConfiguration() {
     );
   }
 
+  const destinations = new Map();
+  for (const [index, article] of configuration.articles.entries()) {
+    const label = `Article ${index + 1}`;
+    if (!article || typeof article !== "object" || Array.isArray(article)) {
+      throw new Error(`${label} must be an object; remove empty list items in articles.yaml.`);
+    }
+    for (const field of ["id", "title", "url", "category"]) {
+      if (typeof article[field] !== "string" || !article[field].trim()) {
+        throw new Error(`${label} requires a nonempty ${field} string.`);
+      }
+    }
+    const url = new URL(article.url);
+    if (!["http:", "https:"].includes(url.protocol)) {
+      throw new Error(`${label} requires an HTTP or HTTPS URL.`);
+    }
+    const id = sanitizeSegment(article.id);
+    const category = sanitizeSegment(article.category);
+    if ([id, category].some(value => !value || value === "." || value === "..")) {
+      throw new Error(`${label} has an invalid id or category for its PDF path.`);
+    }
+    const destination = path.join(category, `${id}.pdf`);
+    if (destinations.has(destination)) {
+      throw new Error(`${label} and article ${destinations.get(destination)} resolve to the same PDF path: ${destination}. Give them distinct IDs or categories.`);
+    }
+    destinations.set(destination, index + 1);
+  }
   return configuration.articles;
 }
 
@@ -235,16 +261,8 @@ async function downloadDirectPdf(article) {
     await response.arrayBuffer(),
   );
 
-  if (buffer.length < 10000) {
-    throw new Error(
-      `Downloaded PDF is suspiciously small: ${buffer.length} bytes.`,
-    );
-  }
-
-  if (buffer.subarray(0, 5).toString() !== "%PDF-") {
-    throw new Error(
-      "Downloaded content does not have a valid PDF signature.",
-    );
+  if (!isCompletePdf(buffer)) {
+    throw new Error("Downloaded content failed the PDF completeness check (missing %PDF- header or %%EOF end marker).");
   }
 
   await fs.writeFile(outputPath, buffer);
@@ -538,10 +556,10 @@ async function main() {
         );
 
         const issue = {
-          id: article.id || null,
-          title: article.title || null,
-          url: article.url || null,
-          category: article.category || null,
+          id: article?.id || null,
+          title: article?.title || null,
+          url: article?.url || null,
+          category: article?.category || null,
           archivedAt: new Date().toISOString(),
           status,
           httpStatus: error.httpStatus || null,
