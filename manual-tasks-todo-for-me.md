@@ -18,9 +18,9 @@ Run `npm run archive:tasks` to refresh this checklist without downloading, or `n
 - [ ] **Cloud Native Platforms: Run**
   - Source: <https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-run/4520188>
   - Save as: `pdfs/cloud-architecture/cloud-native-platforms-run.pdf`
-  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260908T182359Z-1755c7d6b6bfzr68hC1PARqncw00000017qg0000000071e1
+  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260908T190138Z-1579556cffbkjqmkhC1PARz4980000001p30000000002u1k
 
 - [ ] **Cloud Native Platforms: Evolve**
   - Source: <https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-evolve/4520195>
   - Save as: `pdfs/cloud-architecture/cloud-native-platforms-evolve.pdf`
-  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260908T182359Z-1755c7d6b6bds8xmhC1PAR3gf40000000whg0000000002mr
+  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260908T190139Z-1579556cffbx66qdhC1PARa33s0000001pm000000000145r
