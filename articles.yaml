@@ -1,0 +1,12 @@
+articles:
+  - id: cloud-native-platforms-build
+    title: "Cloud Native Platforms: Build"
+    url: "https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-build/4519605"
+    category: cloud-architecture
+    rating: 10
+
+  - id: road-to-composable-data-systems
+    title: "The Road to Composable Data Systems"
+    url: "https://wesmckinney.com/blog/looking-back-15-years/"
+    category: interoperability
+    rating: 10

@@ -1,0 +1,26 @@
+{
+  "name": "data-cloud-architecture-reading-list",
+  "version": "1.0.0",
+  "description": "A highly selective collection of insightful and impactful articles about:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "archive": "node src/archive-articles.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heekof/data-cloud-architecture-reading-list.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "CC-BY-4.0",
+  "bugs": {
+    "url": "https://github.com/heekof/data-cloud-architecture-reading-list/issues"
+  },
+  "homepage": "https://github.com/heekof/data-cloud-architecture-reading-list#readme",
+  "dependencies": {
+    "playwright": "^1.63.0",
+    "yaml": "^2.9.0"
+  },
+  "type": "module"
+}
