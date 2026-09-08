@@ -65,6 +65,73 @@ The script:
 - Writes a summary to `archive-report.json` with one entry per article and a
   `status` of `success`, `skipped`, `blocked` (HTTP 401/403), or `failed`.
 
+## Next Steps: Build a Local RAG System
+
+The next phase of this project is to build a local
+**Retrieval-Augmented Generation (RAG)** system over the archived articles and
+personal reading notes.
+
+RAG allows a Large Language Model to answer questions using knowledge retrieved
+from an external corpus rather than relying only on the knowledge contained in
+the model itself.
+
+In this project:
+
+- **Retrieval** finds the most relevant passages from the articles and personal
+  notes.
+- **Augmentation** adds those passages, their metadata, and their source
+  references to the LLM context.
+- **Generation** uses that evidence to produce a grounded answer with citations.
+
+The objective is not merely to create a vector database or make PDFs
+searchable. The objective is to build a personal architecture RAG system that
+can retrieve, compare, connect, and apply insights from the reading corpus.
+
+### Why RAG
+
+The LLM has not necessarily been trained on every archived article, the latest
+version of each article, or my personal interpretation of those articles.
+
+The local RAG system will provide the LLM with relevant evidence at query time.
+This should make it possible to:
+
+- answer questions using the archived corpus;
+- cite the articles supporting an answer;
+- retrieve exact technical terms and conceptually related passages;
+- compare arguments across multiple authors;
+- distinguish original source content from personal analysis;
+- identify disagreements, limitations, and vendor perspectives;
+- reuse insights in future architectural decisions;
+- acknowledge when the corpus does not contain enough evidence.
+
+### Local RAG architecture
+
+```text
+Article URLs and PDFs
+        ↓
+Content extraction and normalization
+        ↓
+Clean Markdown or structured text
+        ↓
+Semantic chunking
+        ↓
+Metadata enrichment
+        ↓
+Embedding generation
+        ↓
+Local vector index + full-text index
+        ↓
+Hybrid retrieval
+        ↓
+Optional reranking
+        ↓
+Prompt augmentation
+        ↓
+LLM generation
+        ↓
+Grounded answer with source citations
+```
+
 ## License
 
 The original notes, summaries, and analyses in this repository are licensed
