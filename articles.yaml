@@ -146,10 +146,6 @@ articles:
     rating: 7
     note: "Databricks blog. Unity Catalog + AI Gateway for agent governance."
 
-  # ═══════════════════════════════════════════════════
-  # TIER 3 — Cloud Native Platforms series (you have Build, missing Run & Evolve)
-  # ═══════════════════════════════════════════════════
-
   - id: cloud-native-platforms-run
     title: "Cloud Native Platforms: Run"
     url: "https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-run/4520188"
@@ -164,10 +160,6 @@ articles:
     rating: 6
     note: "Part 3 of 3. AI augmenting the software lifecycle."
 
-  # ═══════════════════════════════════════════════════
-  # TIER 4 — Data engineering & platform (in Kindle, relevant to work)
-  # ═══════════════════════════════════════════════════
-
   - id: lakeflow-agentic-data-engineering
     title: "Lakeflow: A New Era of Agentic Data Engineering"
     url: "https://www.databricks.com/blog/lakeflow-new-era-agentic-data-engineering"
@@ -181,7 +173,6 @@ articles:
     category: data-governance
     rating: null
     note: "Joseph Wallace (IAPP). AI exposes governance gaps that were always there."
-
 
   - id: camel-prompt-injection-mitigation
     title: "CaMeL Offers a Promising New Direction for Mitigating Prompt Injection Attacks"
