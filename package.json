@@ -4,8 +4,9 @@
   "description": "A highly selective collection of insightful and impactful articles about:",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "archive": "node src/archive-articles.mjs"
+    "test": "node --test",
+    "archive": "node src/archive-articles.mjs",
+    "archive:tasks": "node src/archive-articles.mjs --refresh-manual-tasks"
   },
   "repository": {
     "type": "git",

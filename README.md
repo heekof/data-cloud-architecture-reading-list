@@ -57,13 +57,55 @@ npm run archive
 
 The script:
 
-- Skips any article whose PDF already exists at
+- Skips any article whose PDF passes a basic header/end-marker check at
   `pdfs/<category>/<id>.pdf` (delete the file to force a re-archive).
 - Uses Playwright (headless Chromium) to render HTML pages to PDF.
 - Downloads URLs ending in `.pdf` directly via `fetch`, validating the
   `application/pdf` content-type and the `%PDF-` signature.
 - Writes a summary to `archive-report.json` with one entry per article and a
   `status` of `success`, `skipped`, `blocked` (HTTP 401/403), or `failed`.
+
+## Manual downloads and issue tracking
+
+Every failed or blocked article is appended to `archive-issues.log`, with its
+URL, timestamp, status, and error. This history is retained across runs.
+`archive-report.json` describes the latest run, while
+`manual-tasks-todo-for-me.md` lists PDFs still missing or needing replacement.
+Both the log and checklist can be tracked in Git.
+
+1. Open `manual-tasks-todo-for-me.md`. Each task includes a source URL, the
+   problem, and the exact destination filename.
+2. Open the article in your browser. Download its PDF or use **Print → Save as
+   PDF**. For a 404, locate the article on the author's or publisher's site;
+   update `articles.yaml` if the URL has changed.
+3. Check that the PDF contains the complete article rather than a login or
+   error page. Create the destination category folder if needed, and save the
+   file at the exact `pdfs/<category>/<id>.pdf` path shown in the checklist.
+4. Run `npm run archive:tasks` to refresh the checklist from the last report
+   and local files without downloading anything. Completed items disappear.
+   You can also run `npm run archive` to retry remaining missing articles.
+
+No YAML flag is needed for manual PDFs. Before accessing a source, the archiver
+checks for an existing file beginning with `%PDF-` and containing `%%EOF` near
+its end. It skips files that pass, including small manually saved PDFs.
+This is a basic completeness check, not a content-quality guarantee.
+An existing file that fails this check is logged and left untouched; inspect,
+replace, or remove it before retrying. Never save a download that is still in
+progress under its final filename.
+
+The checklist is generated, so keep personal notes elsewhere. Checking a box
+alone does not mark an article as archived: the PDF must exist at the expected
+path. Refreshing the checklist also imports errors from the latest report into
+the log without duplicating the same entries. Missing or invalid configuration
+and other run-level failures are logged with a task to fix the run.
+The archive command exits with a nonzero status if any article fails or is blocked.
+
+## Roadmap
+
+- **Phase 1 — Curation :** métadonnées et notes fiables.
+- **Phase 2 — Knowledge base :** extraction vers Markdown/JSON propre.
+- **Phase 3 — Recherche :** full-text puis recherche hybride.
+- **Phase 4 — RAG :** réponses citées et évaluées.
 
 ## Next Steps: Build a Local RAG System
 

@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { chromium } from "playwright";
 import YAML from "yaml";
+import { inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
 
 const ROOT = process.cwd();
 const CONFIG_PATH = path.join(ROOT, "articles.yaml");
@@ -453,9 +454,17 @@ async function main() {
     recursive: true,
   });
 
-  const browser = await chromium.launch({
-    headless: true,
-  });
+  if (process.argv.includes("--refresh-manual-tasks")) {
+    const previous = JSON.parse(await fs.readFile(REPORT_PATH, "utf8"));
+    for (const issue of previous.filter(item => ["blocked", "failed"].includes(item.status))) {
+      await logIssue(ROOT, issue);
+    }
+    await writeManualTasks(ROOT, articles, previous);
+    console.log("Manual tasks refreshed from the last report and local PDFs (no downloads).");
+    return;
+  }
+
+  let browser;
 
   const report = [];
 
@@ -476,11 +485,13 @@ async function main() {
           `${id}.pdf`,
         );
 
-        const existingStats = await fs
-          .stat(outputPath)
-          .catch(() => null);
+        const existingPdf = await inspectPdf(outputPath);
+        if (existingPdf.exists && !existingPdf.valid) {
+          throw new Error(`Existing file is not a complete PDF; inspect or replace it manually: ${path.relative(ROOT, outputPath)}. It was not overwritten.`);
+        }
+        const existingStats = existingPdf.stats;
 
-        if (existingStats && existingStats.size >= 10000) {
+        if (existingPdf.valid) {
           console.log(
             `Skipping (already archived): ${article.title || id}`,
           );
@@ -507,6 +518,9 @@ async function main() {
           article.url,
         ).pathname.toLowerCase().endsWith(".pdf");
 
+        if (!isDirectPdf && !browser) {
+          browser = await chromium.launch({ headless: true });
+        }
         const result = isDirectPdf
           ? await downloadDirectPdf(article)
           : await archiveArticle(browser, article);
@@ -523,7 +537,7 @@ async function main() {
           `  ${status === "blocked" ? "Blocked" : "Failed"}: ${error.message}`,
         );
 
-        report.push({
+        const issue = {
           id: article.id || null,
           title: article.title || null,
           url: article.url || null,
@@ -531,14 +545,15 @@ async function main() {
           archivedAt: new Date().toISOString(),
           status,
           httpStatus: error.httpStatus || null,
-          requiresManualCapture:
-            status === "blocked",
+          requiresManualCapture: true,
           error: error.message,
-        });
+        };
+        report.push(issue);
+        await logIssue(ROOT, issue);
       }
     }
   } finally {
-    await browser.close();
+    await browser?.close();
   }
 
   await fs.writeFile(
@@ -546,6 +561,8 @@ async function main() {
     `${JSON.stringify(report, null, 2)}\n`,
     "utf8",
   );
+
+  await writeManualTasks(ROOT, articles, report);
 
   const successes = report.filter(
     (item) => item.status === "success",
@@ -578,7 +595,13 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
+  try {
+    await logIssue(ROOT, { status: "failed", scope: "run", archivedAt: new Date().toISOString(), error: error.message });
+    await fs.appendFile(path.join(ROOT, "manual-tasks-todo-for-me.md"), `\n- [ ] Archive run could not finish: ${cleanText(error.message)}. Fix this issue and rerun npm run archive.\n`);
+  } catch (logError) {
+    console.error(`Could not save the issue: ${logError.message}`);
+  }
   process.exitCode = 1;
 });
