@@ -4,84 +4,98 @@ articles:
     url: "https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-build/4519605"
     category: cloud-architecture
     rating: 10
+    personal_description: null
 
   - id: road-to-composable-data-systems
     title: "The Road to Composable Data Systems"
     url: "https://wesmckinney.com/blog/looking-back-15-years/"
     category: interoperability
     rating: 10
+    personal_description: null
 
   - id: composable-data-management-system-manifesto
     title: "The Composable Data Management System Manifesto"
     url: "https://www.vldb.org/pvldb/vol16/p2679-pedreira.pdf"
     category: interoperability
     rating: 9.5
+    personal_description: null
 
   - id: begun-the-catalog-wars-have
     title: "Begun, the Catalog Wars Have"
     url: "https://materializedview.io/p/begun-the-catalog-wars-have"
     category: data-governance
     rating: 9
+    personal_description: null
 
   - id: data-lakehouse-catalog-reality-check
     title: "Data Lakehouse Catalog Reality Check"
     url: "https://materializedview.io/p/data-lakehouse-catalog-reality-check"
     category: data-governance
     rating: 10
+    personal_description: null
 
   - id: make-lakehouse-catalogs-boring-again
     title: "Make Lakehouse Catalogs Boring Again"
     url: "https://materializedview.io/p/make-lakehouse-catalogs-boring-again"
     category: data-governance
     rating: 9
+    personal_description: null
 
   - id: snowflake-horizon-vs-databricks-unity-catalog
     title: "Snowflake Horizon vs. Databricks Unity Catalog: Iceberg Comparison"
     url: "https://www.snowflake.com/en/blog/engineering/snowflake-horizon-vs-databricks-unity-catalog-comparison/"
     category: data-governance
     rating: 9
+    personal_description: null
 
   - id: databricks-production-planning
     title: "Databricks Production Planning"
     url: "https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/"
     category: azure-databricks
     rating: 10
+    personal_description: null
 
   - id: architecture-best-practices-for-azure-databricks
     title: "Architecture Best Practices for Azure Databricks"
     url: "https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-databricks"
     category: azure-databricks
     rating: 9.5
+    personal_description: null
 
   - id: design-unity-catalog-architecture
     title: "Design Unity Catalog Architecture"
     url: "https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog"
     category: data-governance
     rating: 10
+    personal_description: null
 
   - id: best-practices-for-abac-policies
     title: "Best Practices for ABAC Policies"
     url: "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/best-practices"
     category: data-governance
     rating: 10
+    personal_description: null
 
   - id: observability-in-databricks
     title: "Observability in Databricks for Jobs, Lakeflow Pipelines, and Lakeflow Connect"
     url: "https://docs.databricks.com/aws/en/data-engineering/observability-best-practices"
     category: azure-databricks
     rating: 9
+    personal_description: null
 
   - id: making-retries-safe-with-idempotent-apis
     title: "Making Retries Safe with Idempotent APIs"
     url: "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"
     category: distributed-systems
     rating: 10
+    personal_description: null
 
   - id: deployment-stamps-pattern
     title: "Deployment Stamps Pattern"
     url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/deployment-stamp"
     category: cloud-architecture
     rating: 9
+    personal_description: null
 
   - id: out-of-the-tar-pit
     title: "Out of the Tar Pit"
@@ -89,6 +103,7 @@ articles:
     category: foundations
     rating: null
     note: "Moseley & Marks (2006). Mutable state as root of accidental complexity."
+    personal_description: null
 
   - id: immutability-changes-everything
     title: "Immutability Changes Everything"
@@ -96,6 +111,7 @@ articles:
     category: foundations
     rating: 9
     note: "Pat Helland (ACM Queue, 2015). Cheap storage makes append-only the default."
+    personal_description: null
 
   - id: the-log
     title: "The Log: What Every Software Engineer Should Know About Real-Time Data's Unifying Abstraction"
@@ -103,6 +119,7 @@ articles:
     category: foundations
     rating: 9
     note: "Jay Kreps (LinkedIn Engineering). The append-only log as unifying abstraction."
+    personal_description: null
 
   - id: databricks-lakeguard-sigmod-2025
     title: "Databricks Lakeguard: Supporting Fine-Grained Access Control and Multi-User Capabilities for Apache Spark Workloads"
@@ -110,6 +127,7 @@ articles:
     category: data-governance
     rating: 7
     note: "Martin Grund et al. (SIGMOD 2025). Unified governance for fine-grained access control."
+    personal_description: null
 
   - id: unity-catalog-open-universal-governance
     title: "Unity Catalog: Open and Universal Governance for the Lakehouse and Beyond"
@@ -117,6 +135,7 @@ articles:
     category: data-governance
     rating: null
     note: "Ramesh Chandra et al. (SIGMOD 2025)."
+    personal_description: null
 
   - id: beyond-indexes-open-table-formats
     title: "Beyond Indexes: How Open Table Formats Optimize Query Performance"
@@ -124,6 +143,7 @@ articles:
     category: data-governance
     rating: 8
     note: "Jack Vanlightly. Indexes in open table formats vs traditional RDBMS."
+    personal_description: null
 
   - id: parallel-change
     title: "Parallel Change"
@@ -131,6 +151,7 @@ articles:
     category: distributed-systems
     rating: 8
     note: "Danilo Sato (martinfowler.com). Expand-migrate-contract for backward-incompatible changes."
+    personal_description: null
 
   - id: making-data-ready-for-agentic-ai
     title: "Making Your Data Ready for Agentic AI"
@@ -138,6 +159,7 @@ articles:
     category: data-governance
     rating: null
     note: "martinfowler.com. Data foundation → context layer → access layer for agents."
+    personal_description: null
 
   - id: governing-ai-agents-unity-catalog
     title: "Governing AI Agents at Scale with Unity Catalog"
@@ -145,6 +167,7 @@ articles:
     category: data-governance
     rating: 7
     note: "Databricks blog. Unity Catalog + AI Gateway for agent governance."
+    personal_description: null
 
   - id: cloud-native-platforms-run
     title: "Cloud Native Platforms: Run"
@@ -152,6 +175,7 @@ articles:
     category: cloud-architecture
     rating: 6
     note: "Part 2 of 3. Day-2 operational disciplines."
+    personal_description: null
 
   - id: cloud-native-platforms-evolve
     title: "Cloud Native Platforms: Evolve"
@@ -159,6 +183,7 @@ articles:
     category: cloud-architecture
     rating: 6
     note: "Part 3 of 3. AI augmenting the software lifecycle."
+    personal_description: null
 
   - id: lakeflow-agentic-data-engineering
     title: "Lakeflow: A New Era of Agentic Data Engineering"
@@ -166,6 +191,7 @@ articles:
     category: data-engineering
     rating: 6
     note: "Databricks blog. Unified ingestion, transformation, orchestration with AI."
+    personal_description: null
 
   - id: ai-governance-data-governance-gone-wild
     title: "AI Governance: Data Governance Gone Wild"
@@ -173,6 +199,7 @@ articles:
     category: data-governance
     rating: null
     note: "Joseph Wallace (IAPP). AI exposes governance gaps that were always there."
+    personal_description: null
 
   - id: camel-prompt-injection-mitigation
     title: "CaMeL Offers a Promising New Direction for Mitigating Prompt Injection Attacks"
@@ -180,6 +207,7 @@ articles:
     category: llm-security
     rating: null
     note: "Simon Willison. First credible prompt injection mitigation via security engineering."
+    personal_description: null
 
   - id: design-patterns-securing-llm-agents
     title: "Design Patterns for Securing LLM Agents against Prompt Injections"
@@ -187,6 +215,7 @@ articles:
     category: llm-security
     rating: 8
     note: "Simon Willison. Six design patterns for agent security."
+    personal_description: null
 
   - id: lethal-trifecta-ai-agents
     title: "The Lethal Trifecta for AI Agents"
@@ -194,3 +223,13 @@ articles:
     category: llm-security
     rating: 8
     note: "Simon Willison. Private data + untrusted content + external communication = exploitable."
+    personal_description: null
+
+  - id: big-data-is-dead
+    title: "Big Data is Dead"
+    url: "https://motherduck.com/blog/big-data-is-dead/"
+    category: data-architecture
+    rating: null
+    note: >
+      Jordan Tigani (2023). Former BigQuery director arguing that most organisations don't have big data, and the distributed architecture they bought for it is overhead. Worth reading adversarially — he's also selling DuckDB — but the empirical claim about query size distributions is the interesting part, and his 2026 follow-up tests it against the Redshift fleet dataset.
+    personal_description: null

@@ -45,15 +45,54 @@ depth alone.
    `templates/article-review.md`.
 3. Run the archiver (see below).
 
-## Archiving articles as PDFs
+## How to run the program
 
-Prerequisites: Node.js 20+.
+Prerequisite: Node.js 20 or later. Run all commands from the repository folder.
+On this Mac, open Terminal and enter:
 
 ```bash
-npm install
+cd /Users/jaafarbendriss/data-cloud-architecture-reading-list
+```
+
+If you cloned the repository elsewhere, use that location instead.
+
+### First-time setup
+
+Install the project dependencies and the browser used to create PDFs:
+
+```bash
+npm ci
 npx playwright install chromium
+```
+
+This setup is already complete on this Mac.
+
+### Run the archiver
+
+After adding or updating entries in `articles.yaml`, run:
+
+```bash
 npm run archive
 ```
+
+The equivalent direct command is `node src/archive-articles.mjs`.
+Existing complete PDFs are skipped; missing articles are downloaded into `pdfs/`.
+At the end, the terminal shows succeeded, skipped, blocked, and failed counts.
+Check `archive-report.json` for the latest results and
+`manual-tasks-todo-for-me.md` for downloads requiring your attention.
+
+### Refresh manual tasks without downloading
+
+After saving manual PDFs, run:
+
+```bash
+npm run archive:tasks
+```
+
+This uses the previous archive report and local PDFs to update the checklist.
+Run the archiver at least once before using this command.
+
+## Archiving articles as PDFs
 
 The script:
 
