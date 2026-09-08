@@ -83,18 +83,6 @@ articles:
     category: cloud-architecture
     rating: 9
 
-# Articles missing from articles.yaml
-# Based on Kindle library and prior conversations
-# Organized by priority tier
-
-# ═══════════════════════════════════════════════════
-# TIER 1 — Foundational chain (state & data architecture)
-# Not in Kindle either — these live in your intellectual toolkit
-# ═══════════════════════════════════════════════════
-
-
-  # --- Moseley diagnoses, Helland prescribes, Kreps builds ---
-
   - id: out-of-the-tar-pit
     title: "Out of the Tar Pit"
     url: "https://curtclifton.net/papers/MoseleyMarks06a.pdf"
@@ -106,7 +94,7 @@ articles:
     title: "Immutability Changes Everything"
     url: "https://queue.acm.org/detail.cfm?id=2884038"
     category: foundations
-    rating: null
+    rating: 9
     note: "Pat Helland (ACM Queue, 2015). Cheap storage makes append-only the default."
 
   - id: the-log
@@ -116,15 +104,11 @@ articles:
     rating: 9
     note: "Jay Kreps (LinkedIn Engineering). The append-only log as unifying abstraction."
 
-  # ═══════════════════════════════════════════════════
-  # TIER 2 — Core professional references (in Kindle, missing from YAML)
-  # ═══════════════════════════════════════════════════
-
   - id: databricks-lakeguard-sigmod-2025
     title: "Databricks Lakeguard: Supporting Fine-Grained Access Control and Multi-User Capabilities for Apache Spark Workloads"
     url: "https://dl.acm.org/doi/10.1145/3722212.3724433"
     category: data-governance
-    rating: null
+    rating: 7
     note: "Martin Grund et al. (SIGMOD 2025). Unified governance for fine-grained access control."
 
   - id: unity-catalog-open-universal-governance
@@ -138,14 +122,14 @@ articles:
     title: "Beyond Indexes: How Open Table Formats Optimize Query Performance"
     url: "https://jack-vanlightly.com/blog/2025/10/8/beyond-indexes-how-open-table-formats-optimize-query-performance"
     category: data-governance
-    rating: null
+    rating: 8
     note: "Jack Vanlightly. Indexes in open table formats vs traditional RDBMS."
 
   - id: parallel-change
     title: "Parallel Change"
     url: "https://martinfowler.com/bliki/ParallelChange.html"
     category: distributed-systems
-    rating: null
+    rating: 8
     note: "Danilo Sato (martinfowler.com). Expand-migrate-contract for backward-incompatible changes."
 
   - id: making-data-ready-for-agentic-ai
@@ -159,7 +143,7 @@ articles:
     title: "Governing AI Agents at Scale with Unity Catalog"
     url: "https://www.databricks.com/blog/governing-ai-agents-scale-unity-catalog"
     category: data-governance
-    rating: null
+    rating: 7
     note: "Databricks blog. Unity Catalog + AI Gateway for agent governance."
 
   # ═══════════════════════════════════════════════════
@@ -170,14 +154,14 @@ articles:
     title: "Cloud Native Platforms: Run"
     url: "https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-run/4520188"
     category: cloud-architecture
-    rating: null
+    rating: 6
     note: "Part 2 of 3. Day-2 operational disciplines."
 
   - id: cloud-native-platforms-evolve
     title: "Cloud Native Platforms: Evolve"
     url: "https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-evolve/4520195"
     category: cloud-architecture
-    rating: null
+    rating: 6
     note: "Part 3 of 3. AI augmenting the software lifecycle."
 
   # ═══════════════════════════════════════════════════
@@ -188,7 +172,7 @@ articles:
     title: "Lakeflow: A New Era of Agentic Data Engineering"
     url: "https://www.databricks.com/blog/lakeflow-new-era-agentic-data-engineering"
     category: data-engineering
-    rating: null
+    rating: 6
     note: "Databricks blog. Unified ingestion, transformation, orchestration with AI."
 
   - id: ai-governance-data-governance-gone-wild
@@ -198,9 +182,6 @@ articles:
     rating: null
     note: "Joseph Wallace (IAPP). AI exposes governance gaps that were always there."
 
-  # ═══════════════════════════════════════════════════
-  # TIER 5 — LLM security trifecta (Simon Willison series)
-  # ═══════════════════════════════════════════════════
 
   - id: camel-prompt-injection-mitigation
     title: "CaMeL Offers a Promising New Direction for Mitigating Prompt Injection Attacks"
@@ -213,12 +194,12 @@ articles:
     title: "Design Patterns for Securing LLM Agents against Prompt Injections"
     url: "https://simonwillison.net/2025/Jun/13/prompt-injection-design-patterns/"
     category: llm-security
-    rating: null
+    rating: 8
     note: "Simon Willison. Six design patterns for agent security."
 
   - id: lethal-trifecta-ai-agents
     title: "The Lethal Trifecta for AI Agents"
     url: "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
     category: llm-security
-    rating: null
+    rating: 8
     note: "Simon Willison. Private data + untrusted content + external communication = exploitable."
