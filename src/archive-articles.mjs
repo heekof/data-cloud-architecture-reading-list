@@ -50,41 +50,55 @@ async function waitForPage(page) {
 
   try {
     await page.waitForLoadState("networkidle", {
-      timeout: 15000,
+      timeout: 10000,
     });
   } catch {
     console.warn(
-      "  Network did not become idle. Continuing.",
+      "  Network did not become idle after 10 seconds. Continuing.",
     );
   }
 
-  await page.evaluate(async () => {
-    if (document.fonts?.ready) {
-      await document.fonts.ready;
-    }
+  try {
+    await page.evaluate(async () => {
+      if (document.fonts?.ready) {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 5000)),
+        ]);
+      }
 
-    const images = Array.from(document.images);
+      const images = Array.from(document.images);
 
-    await Promise.all(
-      images.map((image) => {
-        if (image.complete) {
-          return Promise.resolve();
-        }
+      const imageLoading = Promise.all(
+        images.map((image) => {
+          if (image.complete) {
+            return Promise.resolve();
+          }
 
-        return new Promise((resolve) => {
-          image.addEventListener("load", resolve, {
-            once: true,
+          return new Promise((resolve) => {
+            image.addEventListener("load", resolve, {
+              once: true,
+            });
+
+            image.addEventListener("error", resolve, {
+              once: true,
+            });
           });
+        }),
+      );
 
-          image.addEventListener("error", resolve, {
-            once: true,
-          });
-        });
-      }),
+      await Promise.race([
+        imageLoading,
+        new Promise((resolve) => setTimeout(resolve, 10000)),
+      ]);
+    });
+  } catch (error) {
+    console.warn(
+      `  Page resources did not fully load: ${error.message}`,
     );
-  });
+  }
 
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
 }
 
 async function preparePageForPrinting(page) {
@@ -168,6 +182,91 @@ async function getHttpErrorDetails(page, response) {
   }
 
   return details.join(" | ");
+}
+
+async function downloadDirectPdf(article) {
+  const id = sanitizeSegment(
+    article.id || article.title,
+  );
+
+  const category = sanitizeSegment(
+    article.category || "uncategorized",
+  );
+
+  const outputDirectory = path.join(
+    OUTPUT_ROOT,
+    category,
+  );
+
+  const outputPath = path.join(
+    outputDirectory,
+    `${id}.pdf`,
+  );
+
+  await fs.mkdir(outputDirectory, {
+    recursive: true,
+  });
+
+  console.log(`Downloading PDF: ${article.title || id}`);
+  console.log(`  URL: ${article.url}`);
+
+  const response = await fetch(article.url);
+
+  if (!response.ok) {
+    const error = new Error(
+      `HTTP ${response.status} ${response.statusText}`,
+    );
+
+    error.httpStatus = response.status;
+    throw error;
+  }
+
+  const contentType =
+    response.headers.get("content-type") || "";
+
+  if (!contentType.toLowerCase().includes("application/pdf")) {
+    throw new Error(
+      `Expected a PDF but received: ${contentType || "unknown content type"}`,
+    );
+  }
+
+  const buffer = Buffer.from(
+    await response.arrayBuffer(),
+  );
+
+  if (buffer.length < 10000) {
+    throw new Error(
+      `Downloaded PDF is suspiciously small: ${buffer.length} bytes.`,
+    );
+  }
+
+  if (buffer.subarray(0, 5).toString() !== "%PDF-") {
+    throw new Error(
+      "Downloaded content does not have a valid PDF signature.",
+    );
+  }
+
+  await fs.writeFile(outputPath, buffer);
+
+  console.log(
+    `  Created: ${path.relative(ROOT, outputPath)}`,
+  );
+
+  console.log(
+    `  Size: ${(buffer.length / 1024).toFixed(1)} KB`,
+  );
+
+  return {
+    id,
+    title: article.title || id,
+    url: article.url,
+    category,
+    output: path.relative(ROOT, outputPath),
+    bytes: buffer.length,
+    archivedAt: new Date().toISOString(),
+    status: "success",
+    captureMethod: "direct-download",
+  };
 }
 
 async function archiveArticle(browser, article) {
@@ -363,10 +462,54 @@ async function main() {
   try {
     for (const article of articles) {
       try {
-        const result = await archiveArticle(
-          browser,
-          article,
+        const id = sanitizeSegment(
+          article.id || article.title,
         );
+
+        const category = sanitizeSegment(
+          article.category || "uncategorized",
+        );
+
+        const outputPath = path.join(
+          OUTPUT_ROOT,
+          category,
+          `${id}.pdf`,
+        );
+
+        const existingStats = await fs
+          .stat(outputPath)
+          .catch(() => null);
+
+        if (existingStats && existingStats.size >= 10000) {
+          console.log(
+            `Skipping (already archived): ${article.title || id}`,
+          );
+
+          console.log(
+            `  File: ${path.relative(ROOT, outputPath)}`,
+          );
+
+          report.push({
+            id,
+            title: article.title || id,
+            url: article.url,
+            category,
+            output: path.relative(ROOT, outputPath),
+            bytes: existingStats.size,
+            archivedAt: existingStats.mtime.toISOString(),
+            status: "skipped",
+          });
+
+          continue;
+        }
+
+        const isDirectPdf = new URL(
+          article.url,
+        ).pathname.toLowerCase().endsWith(".pdf");
+
+        const result = isDirectPdf
+          ? await downloadDirectPdf(article)
+          : await archiveArticle(browser, article);
 
         report.push(result);
       } catch (error) {
@@ -416,8 +559,13 @@ async function main() {
     (item) => item.status === "failed",
   ).length;
 
+  const skipped = report.filter(
+    (item) => item.status === "skipped",
+  ).length;
+
   console.log("");
   console.log(`Succeeded: ${successes}`);
+  console.log(`Skipped: ${skipped}`);
   console.log(`Blocked: ${blocked}`);
   console.log(`Failed: ${failures}`);
 

@@ -10,3 +10,75 @@ articles:
     url: "https://wesmckinney.com/blog/looking-back-15-years/"
     category: interoperability
     rating: 10
+
+  - id: composable-data-management-system-manifesto
+    title: "The Composable Data Management System Manifesto"
+    url: "https://www.vldb.org/pvldb/vol16/p2679-pedreira.pdf"
+    category: interoperability
+    rating: 9.5
+
+  - id: begun-the-catalog-wars-have
+    title: "Begun, the Catalog Wars Have"
+    url: "https://materializedview.io/p/begun-the-catalog-wars-have"
+    category: data-governance
+    rating: 9
+
+  - id: data-lakehouse-catalog-reality-check
+    title: "Data Lakehouse Catalog Reality Check"
+    url: "https://materializedview.io/p/data-lakehouse-catalog-reality-check"
+    category: data-governance
+    rating: 10
+
+  - id: make-lakehouse-catalogs-boring-again
+    title: "Make Lakehouse Catalogs Boring Again"
+    url: "https://materializedview.io/p/make-lakehouse-catalogs-boring-again"
+    category: data-governance
+    rating: 9
+
+  - id: snowflake-horizon-vs-databricks-unity-catalog
+    title: "Snowflake Horizon vs. Databricks Unity Catalog: Iceberg Comparison"
+    url: "https://www.snowflake.com/en/blog/engineering/snowflake-horizon-vs-databricks-unity-catalog-comparison/"
+    category: data-governance
+    rating: 9
+
+  - id: databricks-production-planning
+    title: "Databricks Production Planning"
+    url: "https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/"
+    category: azure-databricks
+    rating: 10
+
+  - id: architecture-best-practices-for-azure-databricks
+    title: "Architecture Best Practices for Azure Databricks"
+    url: "https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-databricks"
+    category: azure-databricks
+    rating: 9.5
+
+  - id: design-unity-catalog-architecture
+    title: "Design Unity Catalog Architecture"
+    url: "https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog"
+    category: data-governance
+    rating: 10
+
+  - id: best-practices-for-abac-policies
+    title: "Best Practices for ABAC Policies"
+    url: "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/best-practices"
+    category: data-governance
+    rating: 10
+
+  - id: observability-in-databricks
+    title: "Observability in Databricks for Jobs, Lakeflow Pipelines, and Lakeflow Connect"
+    url: "https://docs.databricks.com/aws/en/data-engineering/observability-best-practices"
+    category: azure-databricks
+    rating: 9
+
+  - id: making-retries-safe-with-idempotent-apis
+    title: "Making Retries Safe with Idempotent APIs"
+    url: "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"
+    category: distributed-systems
+    rating: 10
+
+  - id: deployment-stamps-pattern
+    title: "Deployment Stamps Pattern"
+    url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/deployment-stamp"
+    category: cloud-architecture
+    rating: 9
