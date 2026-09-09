@@ -4,7 +4,7 @@ articles:
     url: "https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-build/4519605"
     category: cloud-architecture
     rating: 10
-    personal_description: null
+    personal_description: "Avoir une platform/solution cloud-based ne la transforme pas magiquement en solution scalable. Pour ce faire, il faut suivre (d'après l'auteur) 5 principes : Resilience, DevOps, Observabilité, Flexibilité et cost management. L'article discute aussi des solutions techniques qui ont fait leurs preuves et explique que livrer != progrès vers la scalabilité."
 
   - id: road-to-composable-data-systems
     title: "The Road to Composable Data Systems"
@@ -88,7 +88,7 @@ articles:
     url: "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"
     category: distributed-systems
     rating: 10
-    personal_description: null
+    personal_description: "Afin de garantir l'idempotence d'une grande partie des appels API, rajouter un token unique à l'appel. Cela transfère la charge côté client."
 
   - id: deployment-stamps-pattern
     title: "Deployment Stamps Pattern"
@@ -111,7 +111,7 @@ articles:
     category: foundations
     rating: 9
     note: "Pat Helland (ACM Queue, 2015). Cheap storage makes append-only the default."
-    personal_description: null
+    personal_description: "We need immutability to coordinate at a distance among other things, and we can afford immutability as storage gets cheaper."
 
   - id: the-log
     title: "The Log: What Every Software Engineer Should Know About Real-Time Data's Unifying Abstraction"
@@ -119,7 +119,7 @@ articles:
     category: foundations
     rating: 9
     note: "Jay Kreps (LinkedIn Engineering). The append-only log as unifying abstraction."
-    personal_description: null
+    personal_description: "Le log (append-only, ordonné) est l'abstraction unificatrice des systèmes distribués : source de vérité pour les bases de données, mécanisme de réplication, et backbone de l'intégration de données en temps réel."
 
   - id: databricks-lakeguard-sigmod-2025
     title: "Databricks Lakeguard: Supporting Fine-Grained Access Control and Multi-User Capabilities for Apache Spark Workloads"
@@ -151,7 +151,7 @@ articles:
     category: distributed-systems
     rating: 8
     note: "Danilo Sato (martinfowler.com). Expand-migrate-contract for backward-incompatible changes."
-    personal_description: null
+    personal_description: "Pattern en 3 phases (expand, migrate, contract) pour changer une interface de manière rétrocompatible : on ajoute la nouvelle version, on migre les consommateurs progressivement, puis on supprime l'ancienne si plus d'usage via le monitoring."
 
   - id: making-data-ready-for-agentic-ai
     title: "Making Your Data Ready for Agentic AI"
@@ -160,6 +160,7 @@ articles:
     rating: null
     note: "martinfowler.com. Data foundation → context layer → access layer for agents."
     personal_description: null
+    ai_summary: "Un humain peut repérer si une donnée a l'air fausse. Un agent IA non — il l'utilise tel quel. Il faut donc préparer la donnée en 3 étapes : s'assurer qu'elle est correcte, lui donner du sens, et contrôler ce que l'agent peut en faire."
 
   - id: governing-ai-agents-unity-catalog
     title: "Governing AI Agents at Scale with Unity Catalog"
@@ -223,7 +224,7 @@ articles:
     category: llm-security
     rating: 8
     note: "Simon Willison. Private data + untrusted content + external communication = exploitable."
-    personal_description: null
+    personal_description: "Un LLM est mal gouverné s'il a au moins 2 de ces 3 trifecta : accès en READ à la data privée, accès en WRITE à l'extérieur et communication externe untrusted."
 
   - id: big-data-is-dead
     title: "Big Data is Dead"
@@ -233,3 +234,48 @@ articles:
     note: >
       Jordan Tigani (2023). Former BigQuery director arguing that most organisations don't have big data, and the distributed architecture they bought for it is overhead. Worth reading adversarially — he's also selling DuckDB — but the empirical claim about query size distributions is the interesting part, and his 2026 follow-up tests it against the Redshift fleet dataset.
     personal_description: null
+
+  - id: designing-data-intensive-applications
+    title: "Designing Data-Intensive Applications"
+    url: null
+    category: foundations
+    rating: 8
+    note: "Martin Kleppmann (2017). The reference book on replication, partitioning, transactions, consistency, batch and stream processing."
+    personal_description: null
+    ai_summary: "Le livre de référence sur les systèmes de données : réplication, partitionnement, transactions, cohérence, batch et stream. Complète The Log, Immutability et Out of the Tar Pit."
+
+  - id: mapreduce-simplified-data-processing
+    title: "MapReduce: Simplified Data Processing on Large Clusters"
+    url: "https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf"
+    category: foundations
+    rating: null
+    note: "Jeff Dean & Sanjay Ghemawat (OSDI 2004). Foundational paper on distributed data processing."
+    personal_description: null
+    ai_summary: "Le papier fondateur de Google sur le traitement de données distribué : diviser le travail en map et reduce, exécuter en parallèle sur des milliers de machines. La base de tout le big data moderne."
+
+  - id: apache-iceberg-definitive-guide
+    title: "Apache Iceberg: The Definitive Guide"
+    url: null
+    category: data-governance
+    rating: null
+    note: "Apache Iceberg. Open table format for huge datasets with schema evolution, partitioning, and time travel."
+    personal_description: null
+    ai_summary: "Format de table ouvert conçu pour les très gros datasets : évolution de schéma, partitionnement caché, time travel. Central dans le débat Databricks/Snowflake et les catalog wars."
+
+  - id: data-mesh
+    title: "Data Mesh"
+    url: null
+    category: data-architecture
+    rating: 7
+    note: "Zhamak Dehghani (2022). Domain-oriented data ownership, data as a product, self-serve platform, federated governance."
+    personal_description: null
+    ai_summary: "Alternative au monolithe data : chaque domaine possède ses données comme un produit, une plateforme self-serve, et une gouvernance fédérée. Dialogue directement avec les catalog wars et la gouvernance centralisée vs distribuée."
+
+  - id: site-reliability-engineering
+    title: "Site Reliability Engineering"
+    url: null
+    category: cloud-architecture
+    rating: null
+    note: "Google SRE. Error budgets, SLIs/SLOs, incident management, postmortems, toil reduction."
+    personal_description: null
+    ai_summary: "Comment Google gère la fiabilité : error budgets, SLIs/SLOs, postmortems blâmeless, réduction du toil. Le pendant pratique des principes de résilience vus dans Cloud Native Platforms."
