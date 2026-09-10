@@ -289,6 +289,14 @@ articles:
     personal_description: null
     ai_summary: "The Software Architect Elevator explique qu'un bon architecte fait le lien entre la stratégie de l'entreprise et la réalité technique. Il ne cherche pas à prendre toutes les décisions, mais aide les équipes à prendre les bonnes en rendant visibles les contraintes et les compromis. Sa valeur vient de sa capacité à changer de niveau, traduire entre dirigeants et ingénieurs, et transformer la technologie en véritable levier pour l'entreprise."
 
+  - id: delta-lake-acid-table-storage
+    title: "Delta Lake: High-Performance ACID Table Storage over Cloud Object Stores"
+    url: "https://dl.acm.org/doi/abs/10.14778/3415478.3415560"
+    category: data-governance
+    rating: null
+    note: "Michael Armbrust et al. (VLDB 2020). ACID transactions and time travel over cloud object stores via a transaction log."
+    personal_description: null
+
   - id: evolutionary-database-design
     title: "Evolutionary Database Design"
     url: "https://martinfowler.com/articles/evodb.html"
