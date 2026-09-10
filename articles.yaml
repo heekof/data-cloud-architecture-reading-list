@@ -305,3 +305,143 @@ articles:
     note: "Pramod Sadalage & Martin Fowler (2016). Database refactoring, version-controlled schema migrations, and CI for databases."
     personal_description: null
     ai_summary: "Permettre au schéma et aux données d'une base de production d'évoluer au même rythme que le code applicatif grâce au versioning des migrations, au refactoring automatisé et à l'intégration continue."
+
+  - id: what-i-talk-about-when-i-talk-about-platforms
+    title: "What I Talk About When I Talk About Platforms"
+    url: "https://martinfowler.com/articles/talk-about-platforms.html"
+    category: platform-engineering
+    source: "gpt6-astra"
+    rating: null
+    note: "Evan Bottcher (2018). Self-service platforms as internal products and reducing backlog coupling between teams."
+    personal_description: null
+    ai_summary: "Une plateforme efficace réduit les dépendances entre équipes grâce au self-service et à des responsabilités claires. Un portail de provisionnement ne suffit pas si chaque changement nécessite encore une succession de tickets."
+
+  - id: designing-data-products
+    title: "Designing Data Products"
+    url: "https://martinfowler.com/articles/designing-data-products.html"
+    category: data-architecture
+    source: "gpt6-astra"
+    rating: null
+    note: "Kiran Prakash (2024). Working backwards from use cases to define data product boundaries, domain ownership, and SLOs."
+    personal_description: null
+    ai_summary: "Partir d'un cas d'usage concret pour définir les produits de données nécessaires, leurs frontières, leurs responsables et leurs objectifs de service. Confronter ensuite le modèle à d'autres usages pour éviter une conception trop spécifique."
+
+  - id: your-ai-product-needs-evals
+    title: "Your AI Product Needs Evals"
+    url: "https://hamel.dev/blog/posts/evals/"
+    category: ai-engineering
+    source: "gpt6-astra"
+    rating: null
+    note: "Hamel Husain (2024). Domain-specific LLM evaluation through tests, traces, human review, and model-based evaluation, including RAG."
+    personal_description: null
+    ai_summary: "Améliorer un produit IA demande de rendre ses erreurs observables et de mesurer les progrès avec des évaluations adaptées au métier. L'article combine tests, inspection des traces et évaluations humaines ou automatisées, avec une application au RAG."
+
+  - id: life-beyond-distributed-transactions
+    title: "Life Beyond Distributed Transactions: An Apostate's Opinion"
+    url: "https://www.cidrdb.org/cidr2007/papers/cidr07p15.pdf"
+    category: distributed-systems
+    source: "gpt6-astra"
+    rating: null
+    note: "Pat Helland (CIDR 2007). Position paper on scalable applications built around entities, local transactions, and messaging without global transactions."
+    personal_description: null
+    ai_summary: "Un cadre de réflexion pour concevoir des applications distribuées sans supposer une transaction globale : délimiter les entités, conserver des transactions locales et expliciter la coordination par messages entre ces entités."
+
+  - id: what-do-you-mean-by-event-driven
+    title: "What Do You Mean by Event-Driven?"
+    url: "https://martinfowler.com/articles/201701-event-driven.html"
+    category: distributed-systems
+    source: "gpt6-astra"
+    rating: null
+    note: "Martin Fowler (2017). Distinguishing event notification, event-carried state transfer, event sourcing, and CQRS."
+    personal_description: null
+    ai_summary: "Le terme event-driven recouvre plusieurs choix différents : notifier un changement, transmettre un état, conserver les événements comme historique ou séparer lectures et écritures. Les distinguer permet de discuter clairement des responsabilités et des compromis."
+
+  - id: building-effective-agents
+    title: "Building Effective Agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    category: ai-engineering
+    source: "gpt6-astra"
+    rating: null
+    note: "Anthropic (2024). Composable agent patterns, the distinction between workflows and autonomous agents, and complexity, latency, and cost trade-offs."
+    personal_description: null
+    ai_summary: "Distinguer les workflows dont les étapes sont définies par le code des agents qui choisissent dynamiquement leurs actions. Commencer par la solution la plus simple et ajouter de l'autonomie lorsque les résultats mesurés justifient son coût et sa complexité."
+
+  - id: laws-of-frugal-architecture
+    title: "The Laws of Frugal Architecture"
+    url: "https://thefrugalarchitect.com/laws/"
+    category: cloud-architecture
+    source: "gpt6-astra"
+    rating: null
+    note: "The Frugal Architect. Principles for cost-aware design, measurement, cost controls, and incremental optimization."
+    personal_description: null
+    ai_summary: "Intégrer le coût dès la conception comme une exigence d'architecture, le relier à la valeur métier et le rendre observable. Arbitrer explicitement coût, performance et résilience, puis optimiser progressivement à partir des mesures."
+
+  - id: governing-data-products-using-fitness-functions
+    title: "Governing Data Products Using Fitness Functions"
+    url: "https://martinfowler.com/articles/fitness-functions-data-products.html"
+    category: data-governance
+    source: "gpt6-astra"
+    rating: null
+    note: "Kiran Prakash (2024). Automated governance checks for data products using architectural fitness functions and catalog metadata."
+    personal_description: null
+    ai_summary: "Transformer des exigences de gouvernance en tests automatisés sur les caractéristiques et les métadonnées des produits de données. Publier les résultats pour détecter les écarts en continu et aider les équipes à les corriger."
+
+  - id: static-stability-using-availability-zones
+    title: "Static Stability Using Availability Zones"
+    url: "https://aws.amazon.com/builders-library/static-stability-using-availability-zones/"
+    category: cloud-architecture
+    source: "gpt6-astra"
+    rating: null
+    note: "Becky Weiss and Mike Furr (Amazon Builders' Library). Static stability, pre-provisioned capacity, and separating control planes from data planes."
+    personal_description: null
+    ai_summary: "Préparer un système à continuer de fonctionner pendant une panne avec les ressources déjà disponibles. Séparer le fonctionnement courant du plan de contrôle et éviter que la reprise dépende du provisionnement immédiat de nouvelles ressources."
+
+  - id: the-quest-for-semantic-architecture
+    title: "The Quest for Semantic Architecture"
+    url: "https://commonsensedata.substack.com/p/the-quest-for-semantic-architecture"
+    category: data-architecture
+    source: "gpt6-astra"
+    rating: null
+    note: "Juha Korpela (2026). Conceptual proposal for managing business semantics independently of data systems, connecting a Knowledge Plane and a Data Plane through explicit semantic links. Implementation questions remain open."
+    personal_description: null
+    ai_summary: "Partager un catalogue ou un format de données ne garantit pas une compréhension commune. L'auteur propose de gérer les concepts métier, leurs définitions et leurs relations indépendamment des outils, puis de les relier explicitement aux objets de données pour préserver leur sens au-delà des frontières techniques."
+
+  - id: naive-reuse-considered-harmful
+    title: "(Naive) Reuse Considered Harmful?"
+    url: "https://architectelevator.com/architecture/reuse-harmful/"
+    category: platform-engineering
+    source: "gpt6-astra"
+    rating: null
+    note: "Gregor Hohpe (2025). Banking examples show how reusing an SMS service for marketing and authentication creates incompatible latency and reliability requirements. Distinguishes capability reuse from sharing runtime resources."
+    personal_description: null
+    ai_summary: "Une fonctionnalité commune ne justifie pas toujours une instance partagée : des campagnes marketing peuvent bloquer les codes d'authentification lorsqu'elles utilisent les mêmes ressources. Concevoir la mutualisation exige de considérer les besoins de latence, de fiabilité et d'isolation, au-delà de la simplicité du diagramme."
+
+  - id: dont-get-locked-up-into-avoiding-lock-in
+    title: "Don't get locked up into avoiding lock-in"
+    url: "https://martinfowler.com/articles/oss-lockin.html"
+    category: cloud-architecture
+    source: "gpt6-astra"
+    rating: null
+    note: "Gregor Hohpe (2019). Models vendor lock-in as a trade-off between utility, switching costs, and the ongoing cost of preserving options. Open source and portability can introduce other dependencies."
+    personal_description: null
+    ai_summary: "Éviter une dépendance fournisseur peut créer des dépendances à une architecture, à des compétences ou à une complexité supplémentaire. Évaluer la portabilité comme un investissement : préciser ce qui doit pouvoir changer, estimer le coût de sortie et le comparer au coût de maintien de cette option."
+
+  - id: the-problem-was-the-product
+    title: "The problem was the product"
+    url: "https://benn.substack.com/p/the-problem-was-the-product"
+    category: data-architecture
+    source: "gpt6-astra"
+    rating: null
+    note: "Benn Stancil (2024). Critical essay arguing that the modern data stack expanded without a coherent shared vision of the end-user experience; individually strong tools and integrations did not resolve fragmented responsibilities."
+    personal_description: null
+    ai_summary: "Assembler d'excellents outils ne produit pas automatiquement un parcours cohérent entre une question métier, une réponse fiable et une décision. Stancil critique la fragmentation du modern data stack, où certaines responsabilités se chevauchent tandis que d'autres restent sans propriétaire, et invite à évaluer l'expérience complète."
+
+  - id: ironies-of-automation
+    title: "Ironies of Automation"
+    url: "https://tc.ifac-control.org/4/1/newsletter/ironies-of-automation/@@download/file/Bainbridge1983_Automatica_Ironies%20of%20automation.pdf"
+    category: foundations
+    source: "gpt6-astra"
+    rating: null
+    note: "Lisanne Bainbridge (Automatica, 1983). Five-page paper on industrial automation and operator skill, monitoring, and exceptional recovery. Its relevance to AI-agent supervision is an architectural analogy, not an AI experiment."
+    personal_description: null
+    ai_summary: "L'automatisation retire aux opérateurs une partie de la pratique qui entretient leurs compétences, puis compte sur eux pour reprendre la main dans les situations les plus difficiles. Une supervision efficace exige donc de préserver la compréhension du système, le contexte de l'incident et l'entraînement aux interventions rares."
