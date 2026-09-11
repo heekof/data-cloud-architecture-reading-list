@@ -3,20 +3,37 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readConfiguration, articlePdfPath } from './article-library.mjs';
+import { reviewQueue, createReviewWriter, exportContext } from './library-workbench.mjs';
 import { indexCorpus, searchCorpus, corpusStats } from './search-index.mjs';
 
-const assets = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']]]);
+const assets = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']], ['/workbench.js', ['workbench.js', 'text/javascript']]]);
 const webRoot = fileURLToPath(new URL('../web/search/', import.meta.url));
 export function createSearchServer(root) {
+  const saveReview = createReviewWriter(root);
   return http.createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'");
     const json = (status, body) => { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(body)); };
     if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(req.headers.host || '')) return json(403, { error: 'Hôte non autorisé.' });
-    if (req.method !== 'GET') return json(405, { error: 'Méthode non autorisée.' });
+    if (!['GET', 'POST'].includes(req.method)) return json(405, { error: 'Méthode non autorisée.' });
     try {
       const url = new URL(req.url, 'http://127.0.0.1');
+      if (req.method === 'POST') {
+        if (!['/api/review', '/api/context'].includes(url.pathname)) return json(405, { error: 'Méthode non autorisée.' });
+        if (req.headers.origin !== `http://${req.headers.host}` || req.headers['x-library-action'] !== '1' || !req.headers['content-type']?.startsWith('application/json')) return json(403, { error: 'Cette action doit provenir de l’interface locale.' });
+        const payload = []; let bytes = 0;
+        for await (const chunk of req) {
+          bytes += chunk.length;
+          if (bytes <= 32768) payload.push(chunk);
+        }
+        if (bytes > 32768) return json(413, { error: 'La requête est trop volumineuse.' });
+        let body;
+        try { body = JSON.parse(Buffer.concat(payload).toString('utf8')); }
+        catch { return json(400, { error: 'Requête JSON invalide.' }); }
+        return json(200, url.pathname === '/api/review' ? await saveReview(body) : await exportContext(root, body));
+      }
+      if (url.pathname === '/api/reviews') return json(200, await reviewQueue(root));
       if (assets.has(url.pathname)) {
         const [file, type] = assets.get(url.pathname);
         const content = await fs.readFile(path.join(webRoot, file));
@@ -51,6 +68,7 @@ export function createSearchServer(root) {
       json(404, { error: 'Page introuvable.' });
     } catch (error) {
       if (res.headersSent) { res.end(); return; }
+      if (error.status) return json(error.status, { error: error.message });
       if (error.code === 'ENOENT') return json(404, { error: 'Ce fichier n’est pas disponible.' });
       console.error(error.message);
       json(500, { error: 'La recherche a rencontré un problème. Consultez le terminal.' });

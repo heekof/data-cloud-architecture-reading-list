@@ -558,6 +558,32 @@ Ouvrez <http://127.0.0.1:4317>. L’index est actualisé au démarrage. Le serve
 accessible uniquement sur votre ordinateur. Arrêtez-le avec Ctrl+C. Pour changer
 le port : `PORT=4318 npm run search`.
 
+### Archivage, serveur et navigateur : trois étapes distinctes
+
+- `npm run archive` récupère les sources manquantes, extrait les textes, actualise
+  les métadonnées, les rapports et l’index de recherche, puis se termine. Cette
+  commande ne démarre pas le serveur de recherche et n’ouvre pas son interface.
+  La capture de pages peut utiliser Chromium en arrière-plan pour créer les PDF.
+- `npm run search` actualise l’index puis démarre le serveur local. La commande
+  reste active dans le terminal jusqu’à son arrêt avec Ctrl+C ; elle n’ouvre pas
+  automatiquement le navigateur.
+- Ouvrez ensuite <http://127.0.0.1:4317> dans votre navigateur pour accéder à la
+  recherche, à la revue qualité et au dossier de contexte. Fermer cet onglet
+  n’arrête pas le serveur.
+
+Exemple, depuis le dossier du dépôt :
+
+```sh
+npm run archive
+npm run search
+```
+
+Si le serveur tourne déjà, lancez l’archivage dans un autre terminal, puis
+rafraîchissez la page pour actualiser les statistiques et relancer la recherche.
+Il n’est pas nécessaire de démarrer une deuxième instance du serveur. Après
+l’arrêt du serveur ou un redémarrage de l’ordinateur, relancez `npm run search`
+pour rendre l’interface à nouveau disponible.
+
 ### Chercher et lire
 
 - Saisissez des mots, par exemple `idempotency` ou `governance`, puis appuyez sur
@@ -620,3 +646,72 @@ Le code est réparti entre `src/search-index.mjs` (index et requêtes),
 local) et `web/search/` (interface). Les tests de `test/search.test.mjs` couvrent
 les filtres, le classement par passages, les expressions, les mises à jour,
 la conservation des textes et les restrictions d’accès du serveur.
+
+### File de revue qualité
+
+Dans l’interface, ouvrez **Revue qualité**. Cette vue lit les 53 entrées de
+l’index global, y compris celles qui n’ont pas de Markdown et sont donc absentes
+de la recherche. Elle contrôle les fichiers actuellement présents et propose :
+
+1. **À vérifier** : source manquante, texte absent/vide ou source rejetée, avec
+   l’action manuelle à effectuer.
+2. **Non revus** : texte disponible mais pas encore vérifié par une personne.
+3. **Validés** : revue humaine positive et aucun fichier requis manquant.
+
+Filtrez par titre, ID ou catégorie. Ouvrez le texte et le PDF pour les comparer,
+puis choisissez **À revoir**, **Valider** ou **Rejeter**, ajoutez une note et
+cliquez sur **Enregistrer**. Une note est obligatoire pour rejeter une source.
+Une validation est bloquée si la source ou le texte non vide manque. Les contrôles
+automatiques ne vérifient pas la fidélité ni la complétude du contenu à votre place.
+
+L’enregistrement met à jour `quality_review` dans le `metadata.yaml` de l’article,
+puis régénère les métadonnées dérivées, les rapports Markdown/CSV et l’index de
+recherche. Les décisions restent révisables. Les PDF et le texte des articles ne
+sont pas modifiés. Les modifications sont locales et pourront être committées
+normalement dans Git. Aucun téléchargement n’est déclenché par la file de revue.
+
+Un formulaire périmé est refusé si les fichiers ont changé depuis son chargement ;
+actualisez la file avant de réessayer. Les enregistrements provenant du même
+serveur sont traités successivement. Évitez de modifier les métadonnées en parallèle
+avec un autre programme pendant un enregistrement. Si la décision a été enregistrée
+mais qu’un rapport ou l’index échoue, l’interface le précise : relancez
+`npm run articles:report` puis `npm run search:index`.
+
+### Exporter un dossier de contexte pour LLM
+
+1. Lancez une recherche et cochez **Ajouter au contexte** sur les articles utiles
+   (dix au maximum). La sélection reste disponible lorsque vous changez les filtres
+   ou la page ; elle est conservée en mémoire jusqu’au rechargement de la page.
+2. Ouvrez **Dossier de contexte**. Donnez éventuellement un sujet et choisissez
+   soit le passage sélectionné de chaque article, soit les articles complets.
+3. Définissez un budget de 100 à 20 000 mots de **contenu**, puis cliquez sur
+   **Préparer l’aperçu**. Les métadonnées s’ajoutent à ce budget ; ce n’est pas une
+   estimation de tokens d’un modèle.
+4. Vérifiez le texte et les éventuelles omissions, puis cliquez sur
+   **Télécharger le Markdown**. Le navigateur télécharge `dossier-contexte.md`.
+   Vous pouvez ensuite fournir ce fichier au LLM de votre choix.
+
+Chaque extrait conserve une référence (`S1`, `S2`, etc.), l’ID, le titre, la
+catégorie, la note, l’URL source, le chemin relatif du Markdown, l’état qualité,
+la note de revue et une empreinte SHA-256 du texte inclus. Le mode passage indique
+également les lignes correspondantes. Le texte est conservé dans un bloc littéral,
+sans synthèse ni réécriture. Le sujet sert d’intitulé et ne déclenche aucune réponse
+à une question.
+
+Les sources rejetées et les textes absents/vides sont exclus. Les textes non revus
+peuvent être inclus avec leur statut explicite. Un article ou passage qui dépasse
+le budget restant est omis en entier, sans troncature ; l’export suit l’ordre de
+sélection. L’aperçu et le fichier listent les omissions. Le téléchargement est
+indisponible si aucun texte n’est inclus.
+
+Un passage devenu périmé après une réindexation ou une modification de texte est
+refusé : relancez la recherche et sélectionnez-le de nouveau. Enregistrer une
+revue depuis l’interface efface la sélection de contexte pour éviter d’exporter
+des références périmées. Aucun export n’est envoyé automatiquement à un service
+externe et aucun fichier de contexte n’est écrit dans le dépôt par le serveur.
+
+Les deux fonctionnalités sont implémentées dans `src/library-workbench.mjs` et
+`web/search/workbench.js`. Les actions d’écriture exigent une requête JSON issue
+de l’interface locale. `npm test` vérifie notamment les décisions persistantes,
+les formulaires périmés, les exclusions, le budget, les références des extraits,
+la conservation des sources et les restrictions des nouvelles routes HTTP.

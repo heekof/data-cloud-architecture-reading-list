@@ -6,6 +6,7 @@ import os from 'node:os';
 import http from 'node:http';
 import YAML from 'yaml';
 import { indexCorpus, searchCorpus, chunkMarkdown } from '../src/search-index.mjs';
+import { reviewQueue, createReviewWriter, exportContext } from '../src/library-workbench.mjs';
 import { createSearchServer } from '../src/search-server.mjs';
 
 async function fixture(t) {
@@ -119,4 +120,83 @@ test('default passages stop around fifty words while retaining exact source line
   assert.equal(chunks.length, 4);
   for (const chunk of chunks) assert.equal(chunk.body.split(/\s+/).length, 50);
   assert.deepEqual(chunks.map(c => [c.start_line, c.end_line]), [[1, 5], [6, 10], [11, 15], [16, 20]]);
+});
+
+test('review queue includes missing articles; decisions persist, protect stale forms and refresh search', async t => {
+  const root = await fixture(t);
+  const initial = await reviewQueue(root);
+  assert.equal(initial.rows.length, 4);
+  assert.ok(initial.rows.find(r => r.id === 'missing').issues.includes('missing_source'));
+  const save = createReviewWriter(root);
+  const missing = initial.rows.find(r => r.id === 'missing');
+  await assert.rejects(save({ id: missing.id, version: missing.version, status: 'approved', notes: '' }), error => error.status === 409);
+  await fs.writeFile(path.join(root, 'articles/alpha/source.pdf'), 'synthetic original source');
+  const alpha = (await reviewQueue(root)).rows.find(r => r.id === 'alpha');
+  const before = await fs.readFile(path.join(root, 'articles/alpha/article.md'));
+  await assert.rejects(save({ id: 'alpha', version: alpha.version, status: 'rejected', notes: '' }), error => error.status === 400);
+  const approved = await save({ id: 'alpha', version: alpha.version, status: 'approved', notes: 'Compared with original.' });
+  assert.deepEqual(approved.warnings, []);
+  assert.equal(approved.rows.find(r => r.id === 'alpha').quality, 'ok');
+  assert.equal((await searchCorpus(root, { quality: 'ok' })).total, 1);
+  await assert.rejects(save({ id: 'alpha', version: alpha.version, status: 'pending', notes: 'Old form' }), error => error.status === 409);
+  const fresh = approved.rows.find(r => r.id === 'alpha');
+  await save({ id: 'alpha', version: fresh.version, status: 'rejected', notes: 'Missing conclusion.' });
+  assert.equal((await searchCorpus(root, { query: 'idempotency' })).total, 0);
+  assert.match(await fs.readFile(path.join(root, 'article-quality.md'), 'utf8'), /Missing conclusion/);
+  assert.match(await fs.readFile(path.join(root, 'articles-overview.md'), 'utf8'), /alpha/);
+  assert.deepEqual(await fs.readFile(path.join(root, 'articles/alpha/article.md')), before);
+  assert.equal(await fs.readFile(path.join(root, 'articles/alpha/source.pdf'), 'utf8'), 'synthetic original source');
+});
+
+test('context exports real selected passages with provenance and excludes rejected or stale sources', async t => {
+  const root = await fixture(t);
+  const result = await searchCorpus(root, { query: 'idempotency', includeRejected: true });
+  const items = result.results.map(a => ({ id: a.id, passage_id: a.passage_id, revision: a.revision }));
+  const body = { items, mode: 'passages', question: 'Reliable retries', maxWords: 100 };
+  const output = await exportContext(root, body);
+  assert.equal(output.included.length, 1);
+  assert.equal(output.omitted.length, 1);
+  assert.equal(output.omitted[0].id, 'beta');
+  assert.match(output.markdown, /https:\/\/example.com\/alpha/);
+  assert.match(output.markdown, /Lignes \d+–\d+/);
+  assert.match(output.markdown, /SHA-256/);
+  assert.match(output.markdown, /revue humaine : pending/);
+  assert.ok(output.words <= 100);
+  assert.match(output.markdown, /Idempotency/);
+  const invalid = structuredClone(body); invalid.items.find(i => i.id === 'alpha').revision = 'outdated';
+  await assert.rejects(exportContext(root, invalid), error => error.status === 409);
+  await fs.writeFile(path.join(root, 'articles/alpha/article.md'), 'A changed document.');
+  await assert.rejects(exportContext(root, body), error => error.status === 409);
+});
+
+test('full-article export preserves text, handles Markdown fences and reports budget omissions', async t => {
+  const root = await fixture(t);
+  const markdown = '# Example\n\n```js\nconst value = 1;\n```\n';
+  await fs.writeFile(path.join(root, 'articles/alpha/article.md'), markdown);
+  const full = await exportContext(root, { items: [{ id: 'alpha' }], mode: 'articles', question: '', maxWords: 100 });
+  assert.ok(full.markdown.includes('````text\n' + markdown + '\n````'));
+  await fs.writeFile(path.join(root, 'articles/alpha/article.md'), 'word '.repeat(101));
+  const limited = await exportContext(root, { items: [{ id: 'alpha' }, { id: 'missing' }], mode: 'articles', question: '', maxWords: 100 });
+  assert.equal(limited.included.length, 0);
+  assert.equal(limited.omitted.length, 2);
+  assert.equal(limited.words, 0);
+  assert.match(limited.omitted[0].reason, /Budget/);
+});
+
+test('review and export endpoints require same-origin JSON actions and reject malformed requests', async t => {
+  const root = await fixture(t);
+  const server = createSearchServer(root);
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => { server.closeAllConnections(); return new Promise(resolve => server.close(resolve)); });
+  const base = `http://127.0.0.1:${server.address().port}`;
+  assert.equal((await (await fetch(base + '/api/reviews')).json()).rows.length, 4);
+  const headers = { 'content-type': 'application/json', 'x-library-action': '1', origin: base };
+  const body = { items: [{ id: 'alpha' }], mode: 'articles', question: 'Évaluation', maxWords: 100 };
+  const success = await fetch(base + '/api/context', { method: 'POST', headers, body: JSON.stringify(body) });
+  assert.equal(success.status, 200);
+  assert.match((await success.json()).markdown, /Évaluation/);
+  assert.equal((await fetch(base + '/api/review', { method: 'POST', headers: { ...headers, origin: 'https://attacker.example' }, body: '{}' })).status, 403);
+  assert.equal((await fetch(base + '/api/review', { method: 'POST', headers, body: '{' })).status, 400);
+  assert.equal((await fetch(base + '/api/context', { method: 'POST', headers, body: '{}' })).status, 400);
+  assert.equal((await fetch(base + '/api/context', { method: 'POST', headers, body: 'x'.repeat(33000) })).status, 413);
 });

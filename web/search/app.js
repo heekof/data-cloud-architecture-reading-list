@@ -79,6 +79,7 @@ function card(article) {
   if ($('query').value.trim()) details.append(element('span', '', `· ${article.matches} passage${article.matches > 1 ? 's' : ''}`));
   const read = element('button', 'read-button', 'Lire le passage →');
   read.addEventListener('click', () => openReader(article));
+  addSelectionControl(article, details);
   bottom.append(details, read); node.append(top, heading, excerpt, bottom);
   return node;
 }
@@ -122,6 +123,7 @@ $('reset').addEventListener('click', () => { for (const id of ['category', 'rati
 $('previous').addEventListener('click', () => { page--; search({ keepPage: true }); });
 $('next').addEventListener('click', () => { page++; search({ keepPage: true }); });
 async function init() {
+  initWorkbench();
   try {
     const stats = await get('/api/stats');
     $('stat-articles').textContent = number(stats.articles); $('stat-words').textContent = number(stats.words);

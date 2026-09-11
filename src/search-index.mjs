@@ -155,5 +155,5 @@ export async function searchCorpus(root, { query = '', category = '', minRating 
   const [{ total }] = await sqlite(root, `${cte} SELECT count(*) AS total ${from};`);
   const results = await sqlite(root, `${cte} SELECT a.*,s.id AS passage_id,s.start_line,s.end_line,s.heading,s.excerpt,s.matches ${from}
     ORDER BY ${expression ? 's.score ASC,' : ''} a.rating DESC,a.title ASC LIMIT ${size} OFFSET ${offset};`);
-  return { total, results: results.map(({ fingerprint, ...result }) => result), page: currentPage, pages: Math.ceil(total / size) };
+  return { total, results: results.map(({ fingerprint, ...result }) => ({ ...result, revision: fingerprint })), page: currentPage, pages: Math.ceil(total / size) };
 }
