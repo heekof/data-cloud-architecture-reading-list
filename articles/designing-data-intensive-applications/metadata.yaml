@@ -1,0 +1,20 @@
+id: designing-data-intensive-applications
+title: Designing Data-Intensive Applications
+url: null
+category: foundations
+rating: 8
+note: Martin Kleppmann (2017). The reference book on replication, partitioning,
+  transactions, consistency, batch and stream processing.
+personal_description: null
+ai_summary: "Le livre de référence sur les systèmes de données : réplication,
+  partitionnement, transactions, cohérence, batch et stream. Complète The Log,
+  Immutability et Out of the Tar Pit."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

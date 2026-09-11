@@ -1,0 +1,22 @@
+id: designing-data-products
+title: Designing Data Products
+url: https://martinfowler.com/articles/designing-data-products.html
+category: data-architecture
+source: gpt6-astra
+rating: null
+note: Kiran Prakash (2024). Working backwards from use cases to define data
+  product boundaries, domain ownership, and SLOs.
+personal_description: null
+ai_summary: Partir d'un cas d'usage concret pour définir les produits de données
+  nécessaires, leurs frontières, leurs responsables et leurs objectifs de
+  service. Confronter ensuite le modèle à d'autres usages pour éviter une
+  conception trop spécifique.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

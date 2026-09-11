@@ -1,0 +1,20 @@
+id: site-reliability-engineering
+title: Site Reliability Engineering
+url: null
+category: cloud-architecture
+rating: null
+note: Google SRE. Error budgets, SLIs/SLOs, incident management, postmortems,
+  toil reduction.
+personal_description: null
+ai_summary: "Comment Google gère la fiabilité : error budgets, SLIs/SLOs,
+  postmortems blâmeless, réduction du toil. Le pendant pratique des principes de
+  résilience vus dans Cloud Native Platforms."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

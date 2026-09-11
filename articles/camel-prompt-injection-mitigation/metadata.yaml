@@ -1,0 +1,15 @@
+id: camel-prompt-injection-mitigation
+title: CaMeL Offers a Promising New Direction for Mitigating Prompt Injection Attacks
+url: https://simonwillison.net/2025/Apr/11/camel/
+category: llm-security
+rating: null
+note: Simon Willison. First credible prompt injection mitigation via security
+  engineering.
+personal_description: null
+word_count: 2376
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

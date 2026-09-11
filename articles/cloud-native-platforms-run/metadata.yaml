@@ -1,0 +1,16 @@
+id: cloud-native-platforms-run
+title: "Cloud Native Platforms: Run"
+url: https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-run/4520188
+category: cloud-architecture
+rating: 6
+note: Part 2 of 3. Day-2 operational disciplines.
+personal_description: null
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

@@ -1,0 +1,18 @@
+id: making-data-ready-for-agentic-ai
+title: Making Your Data Ready for Agentic AI
+url: https://martinfowler.com/articles/making-data-ready-for-agentic-ai.html
+category: data-governance
+rating: null
+note: martinfowler.com. Data foundation → context layer → access layer for agents.
+personal_description: null
+ai_summary: "Un humain peut repérer si une donnée a l'air fausse. Un agent IA
+  non — il l'utilise tel quel. Il faut donc préparer la donnée en 3 étapes :
+  s'assurer qu'elle est correcte, lui donner du sens, et contrôler ce que
+  l'agent peut en faire."
+word_count: 10224
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

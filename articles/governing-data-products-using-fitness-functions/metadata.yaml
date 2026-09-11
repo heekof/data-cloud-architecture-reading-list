@@ -1,0 +1,22 @@
+id: governing-data-products-using-fitness-functions
+title: Governing Data Products Using Fitness Functions
+url: https://martinfowler.com/articles/fitness-functions-data-products.html
+category: data-governance
+source: gpt6-astra
+rating: null
+note: Kiran Prakash (2024). Automated governance checks for data products using
+  architectural fitness functions and catalog metadata.
+personal_description: null
+ai_summary: Transformer des exigences de gouvernance en tests automatisés sur
+  les caractéristiques et les métadonnées des produits de données. Publier les
+  résultats pour détecter les écarts en continu et aider les équipes à les
+  corriger.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

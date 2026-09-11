@@ -1,0 +1,16 @@
+id: cloud-native-platforms-evolve
+title: "Cloud Native Platforms: Evolve"
+url: https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-evolve/4520195
+category: cloud-architecture
+rating: 6
+note: Part 3 of 3. AI augmenting the software lifecycle.
+personal_description: null
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

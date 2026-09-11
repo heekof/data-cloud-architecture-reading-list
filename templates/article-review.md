@@ -8,7 +8,7 @@
 - **Category:** <!-- cloud-architecture | data-governance | distributed-systems | foundations | etc. -->
 - **Rating:** /10
 - **Source Link:** [URL](https://...)
-- **Archived PDF:** `pdfs/<category>/<id>.pdf`
+- **Archived PDF:** `articles/<id>/source.pdf`
 
 ---
 

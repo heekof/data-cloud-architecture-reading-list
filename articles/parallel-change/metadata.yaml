@@ -1,0 +1,18 @@
+id: parallel-change
+title: Parallel Change
+url: https://martinfowler.com/bliki/ParallelChange.html
+category: distributed-systems
+rating: 8
+note: Danilo Sato (martinfowler.com). Expand-migrate-contract for
+  backward-incompatible changes.
+personal_description: "Pattern en 3 phases (expand, migrate, contract) pour
+  changer une interface de manière rétrocompatible : on ajoute la nouvelle
+  version, on migre les consommateurs progressivement, puis on supprime
+  l'ancienne si plus d'usage via le monitoring."
+word_count: 1331
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

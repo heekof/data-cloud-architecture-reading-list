@@ -1,0 +1,17 @@
+id: cloud-native-platforms-build
+title: "Cloud Native Platforms: Build"
+url: https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-build/4519605
+category: cloud-architecture
+rating: 10
+personal_description: "Avoir une platform/solution cloud-based ne la transforme
+  pas magiquement en solution scalable. Pour ce faire, il faut suivre (d'après
+  l'auteur) 5 principes : Resilience, DevOps, Observabilité, Flexibilité et cost
+  management. L'article discute aussi des solutions techniques qui ont fait
+  leurs preuves et explique que livrer != progrès vers la scalabilité."
+word_count: 2971
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

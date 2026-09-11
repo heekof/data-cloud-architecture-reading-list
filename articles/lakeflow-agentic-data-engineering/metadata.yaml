@@ -1,0 +1,17 @@
+id: lakeflow-agentic-data-engineering
+title: "Lakeflow: A New Era of Agentic Data Engineering"
+url: https://www.databricks.com/blog/lakeflow-new-era-agentic-data-engineering
+category: data-engineering
+rating: 6
+note: Databricks blog. Unified ingestion, transformation, orchestration with AI.
+personal_description: null
+word_count: 199
+quality:
+  status: needs_review
+  issues:
+    - review_rejected
+quality_review:
+  status: rejected
+  notes: The source PDF contains only one page of opening announcement text.
+    Full-article completeness is unverified; review or replace the capture
+    before approval.

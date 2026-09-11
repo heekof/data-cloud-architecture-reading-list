@@ -1,0 +1,15 @@
+id: delta-lake-acid-table-storage
+title: "Delta Lake: High-Performance ACID Table Storage over Cloud Object Stores"
+url: https://dl.acm.org/doi/abs/10.14778/3415478.3415560
+category: data-governance
+rating: null
+note: Michael Armbrust et al. (VLDB 2020). ACID transactions and time travel
+  over cloud object stores via a transaction log.
+personal_description: null
+word_count: 14632
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

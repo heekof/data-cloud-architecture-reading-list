@@ -1,0 +1,14 @@
+id: beyond-indexes-open-table-formats
+title: "Beyond Indexes: How Open Table Formats Optimize Query Performance"
+url: https://jack-vanlightly.com/blog/2025/10/8/beyond-indexes-how-open-table-formats-optimize-query-performance
+category: data-governance
+rating: 8
+note: Jack Vanlightly. Indexes in open table formats vs traditional RDBMS.
+personal_description: null
+word_count: 5597
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

@@ -1,0 +1,17 @@
+id: governing-ai-agents-unity-catalog
+title: Governing AI Agents at Scale with Unity Catalog
+url: https://www.databricks.com/blog/governing-ai-agents-scale-unity-catalog
+category: data-governance
+rating: 7
+note: Databricks blog. Unity Catalog + AI Gateway for agent governance.
+personal_description: null
+word_count: 221
+quality:
+  status: needs_review
+  issues:
+    - review_rejected
+quality_review:
+  status: rejected
+  notes: The one-page source PDF visibly cuts off mid-sentence at the bottom.
+    Markdown reproduces the available opening text; obtain a complete source
+    before approval.

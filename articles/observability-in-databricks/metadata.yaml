@@ -1,0 +1,13 @@
+id: observability-in-databricks
+title: Observability in Databricks for Jobs, Lakeflow Pipelines, and Lakeflow Connect
+url: https://docs.databricks.com/aws/en/data-engineering/observability-best-practices
+category: azure-databricks
+rating: 9
+personal_description: null
+word_count: 2191
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

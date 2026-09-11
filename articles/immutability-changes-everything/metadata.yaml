@@ -1,0 +1,15 @@
+id: immutability-changes-everything
+title: Immutability Changes Everything
+url: https://queue.acm.org/detail.cfm?id=2884038
+category: foundations
+rating: 9
+note: Pat Helland (ACM Queue, 2015). Cheap storage makes append-only the default.
+personal_description: We need immutability to coordinate at a distance among
+  other things, and we can afford immutability as storage gets cheaper.
+word_count: 5675
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

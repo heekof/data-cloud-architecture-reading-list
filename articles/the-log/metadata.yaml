@@ -1,0 +1,18 @@
+id: the-log
+title: "The Log: What Every Software Engineer Should Know About Real-Time Data's
+  Unifying Abstraction"
+url: https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying
+category: foundations
+rating: 9
+note: Jay Kreps (LinkedIn Engineering). The append-only log as unifying abstraction.
+personal_description: "Le log (append-only, ordonné) est l'abstraction
+  unificatrice des systèmes distribués : source de vérité pour les bases de
+  données, mécanisme de réplication, et backbone de l'intégration de données en
+  temps réel."
+word_count: 13095
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

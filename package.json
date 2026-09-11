@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node --test",
     "archive": "node src/archive-articles.mjs",
-    "archive:tasks": "node src/archive-articles.mjs --refresh-manual-tasks"
+    "archive:tasks": "node src/archive-articles.mjs --refresh-manual-tasks",
+    "metadata:sync": "node src/sync-metadata.mjs",
+    "extract": "node src/extract-articles.mjs"
   },
   "repository": {
     "type": "git",

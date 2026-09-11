@@ -1,0 +1,23 @@
+id: life-beyond-distributed-transactions
+title: "Life Beyond Distributed Transactions: An Apostate's Opinion"
+url: https://www.cidrdb.org/cidr2007/papers/cidr07p15.pdf
+category: distributed-systems
+source: gpt6-astra
+rating: null
+note: Pat Helland (CIDR 2007). Position paper on scalable applications built
+  around entities, local transactions, and messaging without global
+  transactions.
+personal_description: null
+ai_summary: "Un cadre de réflexion pour concevoir des applications distribuées
+  sans supposer une transaction globale : délimiter les entités, conserver des
+  transactions locales et expliciter la coordination par messages entre ces
+  entités."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

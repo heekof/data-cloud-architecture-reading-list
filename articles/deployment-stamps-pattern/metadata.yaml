@@ -1,0 +1,13 @@
+id: deployment-stamps-pattern
+title: Deployment Stamps Pattern
+url: https://learn.microsoft.com/en-us/azure/architecture/patterns/deployment-stamp
+category: cloud-architecture
+rating: 9
+personal_description: null
+word_count: 2897
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

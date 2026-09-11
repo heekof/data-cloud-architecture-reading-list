@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { articlePdfPath } from "./article-library.mjs";
 
 export function isCompletePdf(buffer) {
   // Basic completeness check, not a guarantee that the captured article is correct.
@@ -32,9 +33,6 @@ export async function logIssue(root, issue) {
   if (!previous.split("\n").includes(line)) await fs.appendFile(filename, line + "\n");
 }
 
-function segment(value) {
-  return String(value).normalize("NFKD").replace(/[^\w.-]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase();
-}
 function oneLine(value) { return String(value).replace(/\s+/g, " ").trim(); }
 
 export async function writeManualTasks(root, articles, report) {
@@ -46,13 +44,13 @@ export async function writeManualTasks(root, articles, report) {
   ];
   let count = 0;
   for (const article of articles) {
-    const output = `pdfs/${segment(article.category || "uncategorized")}/${segment(article.id || article.title)}.pdf`;
+    const output = articlePdfPath(article);
     const pdf = await inspectPdf(path.join(root, output));
     if (pdf.valid) continue;
     count++;
     const issue = report.find(item => item.id === article.id && ["blocked", "failed"].includes(item.status));
     lines.push(`- [ ] **${oneLine(article.title)}**`,
-      `  - Source: <${article.url}>`,
+      `  - Source: ${article.url ? `<${article.url}>` : "URL missing; add it to articles.yaml or supply a PDF manually."}`,
       `  - Save as: \`${output}\``,
       `  - Issue: ${oneLine(pdf.exists ? "Existing file failed the PDF completeness check. Inspect or replace it; it will not be overwritten." : issue?.error || "PDF is missing; no recorded download error.")}`,
       ...(issue?.httpStatus === 404 ? ["  - Action: find the article on the author's or publisher's site; update its URL in articles.yaml if it moved."] : []), "");

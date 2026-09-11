@@ -1,0 +1,13 @@
+id: design-unity-catalog-architecture
+title: Design Unity Catalog Architecture
+url: https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog
+category: data-governance
+rating: 10
+personal_description: null
+word_count: 3502
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

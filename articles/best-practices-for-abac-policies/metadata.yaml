@@ -1,0 +1,13 @@
+id: best-practices-for-abac-policies
+title: Best Practices for ABAC Policies
+url: https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/best-practices
+category: data-governance
+rating: 10
+personal_description: null
+word_count: 985
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

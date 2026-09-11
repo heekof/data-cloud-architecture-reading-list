@@ -1,0 +1,22 @@
+id: what-do-you-mean-by-event-driven
+title: What Do You Mean by Event-Driven?
+url: https://martinfowler.com/articles/201701-event-driven.html
+category: distributed-systems
+source: gpt6-astra
+rating: null
+note: Martin Fowler (2017). Distinguishing event notification, event-carried
+  state transfer, event sourcing, and CQRS.
+personal_description: null
+ai_summary: "Le terme event-driven recouvre plusieurs choix différents :
+  notifier un changement, transmettre un état, conserver les événements comme
+  historique ou séparer lectures et écritures. Les distinguer permet de discuter
+  clairement des responsabilités et des compromis."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

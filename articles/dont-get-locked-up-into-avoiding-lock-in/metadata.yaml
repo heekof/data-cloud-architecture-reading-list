@@ -1,0 +1,23 @@
+id: dont-get-locked-up-into-avoiding-lock-in
+title: Don't get locked up into avoiding lock-in
+url: https://martinfowler.com/articles/oss-lockin.html
+category: cloud-architecture
+source: gpt6-astra
+rating: null
+note: Gregor Hohpe (2019). Models vendor lock-in as a trade-off between utility,
+  switching costs, and the ongoing cost of preserving options. Open source and
+  portability can introduce other dependencies.
+personal_description: null
+ai_summary: "Éviter une dépendance fournisseur peut créer des dépendances à une
+  architecture, à des compétences ou à une complexité supplémentaire. Évaluer la
+  portabilité comme un investissement : préciser ce qui doit pouvoir changer,
+  estimer le coût de sortie et le comparer au coût de maintien de cette option."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

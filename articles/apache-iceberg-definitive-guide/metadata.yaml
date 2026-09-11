@@ -1,0 +1,20 @@
+id: apache-iceberg-definitive-guide
+title: "Apache Iceberg: The Definitive Guide"
+url: null
+category: data-governance
+rating: null
+note: Apache Iceberg. Open table format for huge datasets with schema evolution,
+  partitioning, and time travel.
+personal_description: null
+ai_summary: "Format de table ouvert conçu pour les très gros datasets :
+  évolution de schéma, partitionnement caché, time travel. Central dans le débat
+  Databricks/Snowflake et les catalog wars."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

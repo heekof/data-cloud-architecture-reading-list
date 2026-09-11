@@ -1,0 +1,15 @@
+id: making-retries-safe-with-idempotent-apis
+title: Making Retries Safe with Idempotent APIs
+url: https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/
+category: distributed-systems
+rating: 10
+personal_description: Afin de garantir l'idempotence d'une grande partie des
+  appels API, rajouter un token unique à l'appel. Cela transfère la charge côté
+  client.
+word_count: 3352
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

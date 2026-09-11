@@ -1,0 +1,24 @@
+id: the-architect-elevator
+title: The Architect Elevator
+url: null
+category: cloud-architecture
+rating: null
+note: Gregor Hohpe (2020). Connecting executive vision with technical decisions
+  — the architect as a translator between strategy and implementation.
+personal_description: null
+ai_summary: The Software Architect Elevator explique qu'un bon architecte fait
+  le lien entre la stratégie de l'entreprise et la réalité technique. Il ne
+  cherche pas à prendre toutes les décisions, mais aide les équipes à prendre
+  les bonnes en rendant visibles les contraintes et les compromis. Sa valeur
+  vient de sa capacité à changer de niveau, traduire entre dirigeants et
+  ingénieurs, et transformer la technologie en véritable levier pour
+  l'entreprise.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

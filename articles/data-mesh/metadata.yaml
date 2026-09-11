@@ -1,0 +1,21 @@
+id: data-mesh
+title: Data Mesh
+url: null
+category: data-architecture
+rating: 7
+note: Zhamak Dehghani (2022). Domain-oriented data ownership, data as a product,
+  self-serve platform, federated governance.
+personal_description: null
+ai_summary: "Alternative au monolithe data : chaque domaine possède ses données
+  comme un produit, une plateforme self-serve, et une gouvernance fédérée.
+  Dialogue directement avec les catalog wars et la gouvernance centralisée vs
+  distribuée."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

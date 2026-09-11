@@ -2,21 +2,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { chromium } from "playwright";
-import YAML from "yaml";
+import { readConfiguration, sanitizeSegment, articlePdfPath, syncMetadata } from "./article-library.mjs";
 import { fetchPdfBuffer, inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
 
 const ROOT = process.cwd();
-const CONFIG_PATH = path.join(ROOT, "articles.yaml");
-const OUTPUT_ROOT = path.join(ROOT, "pdfs");
+const OUTPUT_ROOT = path.join(ROOT, "articles");
 const REPORT_PATH = path.join(ROOT, "archive-report.json");
-
-function sanitizeSegment(value) {
-  return String(value)
-    .normalize("NFKD")
-    .replace(/[^\w.-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .toLowerCase();
-}
 
 function escapeHtml(value) {
   return String(value)
@@ -31,45 +22,6 @@ function cleanText(value) {
   return String(value)
     .replace(/\s+/g, " ")
     .trim();
-}
-
-async function readConfiguration() {
-  const raw = await fs.readFile(CONFIG_PATH, "utf8");
-  const configuration = YAML.parse(raw);
-
-  if (!configuration?.articles || !Array.isArray(configuration.articles)) {
-    throw new Error(
-      "articles.yaml must contain an 'articles' array.",
-    );
-  }
-
-  const destinations = new Map();
-  for (const [index, article] of configuration.articles.entries()) {
-    const label = `Article ${index + 1}`;
-    if (!article || typeof article !== "object" || Array.isArray(article)) {
-      throw new Error(`${label} must be an object; remove empty list items in articles.yaml.`);
-    }
-    for (const field of ["id", "title", "url", "category"]) {
-      if (typeof article[field] !== "string" || !article[field].trim()) {
-        throw new Error(`${label} requires a nonempty ${field} string.`);
-      }
-    }
-    const url = new URL(article.url);
-    if (!["http:", "https:"].includes(url.protocol)) {
-      throw new Error(`${label} requires an HTTP or HTTPS URL.`);
-    }
-    const id = sanitizeSegment(article.id);
-    const category = sanitizeSegment(article.category);
-    if ([id, category].some(value => !value || value === "." || value === "..")) {
-      throw new Error(`${label} has an invalid id or category for its PDF path.`);
-    }
-    const destination = path.join(category, `${id}.pdf`);
-    if (destinations.has(destination)) {
-      throw new Error(`${label} and article ${destinations.get(destination)} resolve to the same PDF path: ${destination}. Give them distinct IDs or categories.`);
-    }
-    destinations.set(destination, index + 1);
-  }
-  return configuration.articles;
 }
 
 async function waitForPage(page) {
@@ -220,15 +172,8 @@ async function downloadDirectPdf(article, buffer) {
     article.category || "uncategorized",
   );
 
-  const outputDirectory = path.join(
-    OUTPUT_ROOT,
-    category,
-  );
-
-  const outputPath = path.join(
-    outputDirectory,
-    `${id}.pdf`,
-  );
+  const outputPath = path.join(ROOT, articlePdfPath(article));
+  const outputDirectory = path.dirname(outputPath);
 
   await fs.mkdir(outputDirectory, {
     recursive: true,
@@ -275,15 +220,8 @@ async function archiveArticle(browser, article) {
     );
   }
 
-  const outputDirectory = path.join(
-    OUTPUT_ROOT,
-    category,
-  );
-
-  const outputPath = path.join(
-    outputDirectory,
-    `${id}.pdf`,
-  );
+  const outputPath = path.join(ROOT, articlePdfPath(article));
+  const outputDirectory = path.dirname(outputPath);
 
   await fs.mkdir(outputDirectory, {
     recursive: true,
@@ -430,7 +368,8 @@ async function archiveArticle(browser, article) {
 }
 
 async function main() {
-  const articles = await readConfiguration();
+  const articles = await readConfiguration(ROOT);
+  await syncMetadata(ROOT, articles);
 
   if (articles.length === 0) {
     console.log(
@@ -469,11 +408,7 @@ async function main() {
           article.category || "uncategorized",
         );
 
-        const outputPath = path.join(
-          OUTPUT_ROOT,
-          category,
-          `${id}.pdf`,
-        );
+        const outputPath = path.join(ROOT, articlePdfPath(article));
 
         const existingPdf = await inspectPdf(outputPath);
         if (existingPdf.exists && !existingPdf.valid) {
@@ -502,6 +437,10 @@ async function main() {
           });
 
           continue;
+        }
+
+        if (!article.url) {
+          throw new Error("Source URL is missing; add it to articles.yaml or save a PDF manually.");
         }
 
         const isDirectPdf = new URL(

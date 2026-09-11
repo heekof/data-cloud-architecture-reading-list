@@ -22,7 +22,7 @@ To keep the repository clean and maintainable, understand the distinction betwee
 
 | Layer | Location | Purpose | Unit of Content |
 |---|---|---|---|
-| **Source Article** | `pdfs/` & `articles.yaml` | External evidence and foundational knowledge | Original publication / PDF |
+| **Source Article** | `articles/<id>/` & `articles.yaml` | External evidence and foundational knowledge | Original publication / PDF |
 | **Article Review** | `articles/<category>.md` | Critical evaluation of a single source | Summary, principles, and behavioral change |
 | **Synthesis Note** | `notes/synthesis-topics.md` | Cross-source comparison and debate | Reconciling trade-offs across multiple works |
 | **Practical Artifact** | `artifacts/` | Original, applicable tools for teams | Checklists, matrices, principles, ADRs |

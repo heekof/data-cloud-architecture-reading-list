@@ -1,0 +1,22 @@
+id: building-effective-agents
+title: Building Effective Agents
+url: https://www.anthropic.com/engineering/building-effective-agents
+category: ai-engineering
+source: gpt6-astra
+rating: null
+note: Anthropic (2024). Composable agent patterns, the distinction between
+  workflows and autonomous agents, and complexity, latency, and cost trade-offs.
+personal_description: null
+ai_summary: Distinguer les workflows dont les étapes sont définies par le code
+  des agents qui choisissent dynamiquement leurs actions. Commencer par la
+  solution la plus simple et ajouter de l'autonomie lorsque les résultats
+  mesurés justifient son coût et sa complexité.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

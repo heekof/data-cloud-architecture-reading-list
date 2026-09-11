@@ -1,0 +1,22 @@
+id: your-ai-product-needs-evals
+title: Your AI Product Needs Evals
+url: https://hamel.dev/blog/posts/evals/
+category: ai-engineering
+source: gpt6-astra
+rating: null
+note: Hamel Husain (2024). Domain-specific LLM evaluation through tests, traces,
+  human review, and model-based evaluation, including RAG.
+personal_description: null
+ai_summary: Améliorer un produit IA demande de rendre ses erreurs observables et
+  de mesurer les progrès avec des évaluations adaptées au métier. L'article
+  combine tests, inspection des traces et évaluations humaines ou automatisées,
+  avec une application au RAG.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

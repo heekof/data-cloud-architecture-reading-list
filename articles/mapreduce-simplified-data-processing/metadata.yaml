@@ -1,0 +1,20 @@
+id: mapreduce-simplified-data-processing
+title: "MapReduce: Simplified Data Processing on Large Clusters"
+url: https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf
+category: foundations
+rating: null
+note: Jeff Dean & Sanjay Ghemawat (OSDI 2004). Foundational paper on distributed
+  data processing.
+personal_description: null
+ai_summary: "Le papier fondateur de Google sur le traitement de données
+  distribué : diviser le travail en map et reduce, exécuter en parallèle sur des
+  milliers de machines. La base de tout le big data moderne."
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

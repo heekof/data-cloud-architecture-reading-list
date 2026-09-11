@@ -1,0 +1,16 @@
+id: unity-catalog-open-universal-governance
+title: "Unity Catalog: Open and Universal Governance for the Lakehouse and Beyond"
+url: https://dl.acm.org/doi/abs/10.1145/3722212.3724459
+category: data-governance
+rating: null
+note: Ramesh Chandra et al. (SIGMOD 2025).
+personal_description: null
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

@@ -1,0 +1,13 @@
+id: databricks-production-planning
+title: Databricks Production Planning
+url: https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/
+category: azure-databricks
+rating: 10
+personal_description: null
+word_count: 696
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

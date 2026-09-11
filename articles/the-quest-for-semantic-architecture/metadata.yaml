@@ -1,0 +1,24 @@
+id: the-quest-for-semantic-architecture
+title: The Quest for Semantic Architecture
+url: https://commonsensedata.substack.com/p/the-quest-for-semantic-architecture
+category: data-architecture
+source: gpt6-astra
+rating: null
+note: Juha Korpela (2026). Conceptual proposal for managing business semantics
+  independently of data systems, connecting a Knowledge Plane and a Data Plane
+  through explicit semantic links. Implementation questions remain open.
+personal_description: null
+ai_summary: Partager un catalogue ou un format de données ne garantit pas une
+  compréhension commune. L'auteur propose de gérer les concepts métier, leurs
+  définitions et leurs relations indépendamment des outils, puis de les relier
+  explicitement aux objets de données pour préserver leur sens au-delà des
+  frontières techniques.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

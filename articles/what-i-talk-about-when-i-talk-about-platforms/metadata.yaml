@@ -1,0 +1,22 @@
+id: what-i-talk-about-when-i-talk-about-platforms
+title: What I Talk About When I Talk About Platforms
+url: https://martinfowler.com/articles/talk-about-platforms.html
+category: platform-engineering
+source: gpt6-astra
+rating: null
+note: Evan Bottcher (2018). Self-service platforms as internal products and
+  reducing backlog coupling between teams.
+personal_description: null
+ai_summary: Une plateforme efficace réduit les dépendances entre équipes grâce
+  au self-service et à des responsabilités claires. Un portail de
+  provisionnement ne suffit pas si chaque changement nécessite encore une
+  succession de tickets.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

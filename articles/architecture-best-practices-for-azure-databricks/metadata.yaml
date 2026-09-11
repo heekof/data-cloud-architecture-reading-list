@@ -1,0 +1,13 @@
+id: architecture-best-practices-for-azure-databricks
+title: Architecture Best Practices for Azure Databricks
+url: https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-databricks
+category: azure-databricks
+rating: 9.5
+personal_description: null
+word_count: 11373
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

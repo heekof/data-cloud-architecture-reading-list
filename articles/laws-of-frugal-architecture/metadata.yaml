@@ -1,0 +1,22 @@
+id: laws-of-frugal-architecture
+title: The Laws of Frugal Architecture
+url: https://thefrugalarchitect.com/laws/
+category: cloud-architecture
+source: gpt6-astra
+rating: null
+note: The Frugal Architect. Principles for cost-aware design, measurement, cost
+  controls, and incremental optimization.
+personal_description: null
+ai_summary: Intégrer le coût dès la conception comme une exigence
+  d'architecture, le relier à la valeur métier et le rendre observable. Arbitrer
+  explicitement coût, performance et résilience, puis optimiser progressivement
+  à partir des mesures.
+word_count: null
+quality:
+  status: needs_review
+  issues:
+    - missing_source
+    - missing_markdown
+quality_review:
+  status: pending
+  notes: null

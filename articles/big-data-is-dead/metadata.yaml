@@ -1,0 +1,19 @@
+id: big-data-is-dead
+title: Big Data is Dead
+url: https://motherduck.com/blog/big-data-is-dead/
+category: data-architecture
+rating: null
+note: >
+  Jordan Tigani (2023). Former BigQuery director arguing that most organisations
+  don't have big data, and the distributed architecture they bought for it is
+  overhead. Worth reading adversarially — he's also selling DuckDB — but the
+  empirical claim about query size distributions is the interesting part, and
+  his 2026 follow-up tests it against the Redshift fleet dataset.
+personal_description: null
+word_count: 4170
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

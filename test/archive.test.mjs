@@ -38,24 +38,24 @@ test('failures are logged; manual PDFs are skipped and tasks resolve without los
     assert.deepEqual(log.trim().split('\n').map(line => JSON.parse(line).httpStatus), [403, 404]);
     let tasks = await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8');
     assert.equal((tasks.match(/- \[ \]/g) || []).length, 2);
-    assert.match(tasks, /pdfs\/test\/missing.pdf/);
+    assert.match(tasks, /articles\/missing\/source\.pdf/);
     assert.match(tasks, /find the article/);
     assert.equal((await run(root, ['--refresh-manual-tasks'])).code, 0);
     assert.equal(await fs.readFile(path.join(root, 'archive-issues.log'), 'utf8'), log);
     // A tiny PDF fixture exercises removal of the old 10 KB skip threshold.
     const pdf = '%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n';
-    for (const id of ['blocked', 'missing']) await fs.writeFile(path.join(root, `pdfs/test/${id}.pdf`), pdf);
+    for (const id of ['blocked', 'missing']) await fs.writeFile(path.join(root, `articles/${id}/source.pdf`), pdf);
     assert.equal((await run(root)).code, 0);
     assert.equal(requests, 2, 'manual files must prevent new requests');
     const report = JSON.parse(await fs.readFile(path.join(root, 'archive-report.json'), 'utf8'));
     assert.ok(report.every(item => item.status === 'skipped'));
-    assert.equal(await fs.readFile(path.join(root, 'pdfs/test/blocked.pdf'), 'utf8'), pdf);
+    assert.equal(await fs.readFile(path.join(root, 'articles/blocked/source.pdf'), 'utf8'), pdf);
     assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /No manual downloads pending/);
     assert.equal(await fs.readFile(path.join(root, 'archive-issues.log'), 'utf8'), log);
-    await fs.writeFile(path.join(root, 'pdfs/test/blocked.pdf'), '<html>Error</html>');
+    await fs.writeFile(path.join(root, 'articles/blocked/source.pdf'), '<html>Error</html>');
     assert.equal((await run(root)).code, 1);
     assert.equal(requests, 2);
-    assert.equal(await fs.readFile(path.join(root, 'pdfs/test/blocked.pdf'), 'utf8'), '<html>Error</html>');
+    assert.equal(await fs.readFile(path.join(root, 'articles/blocked/source.pdf'), 'utf8'), '<html>Error</html>');
     assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /Existing file failed/);
   } finally {
     await new Promise(resolve => server.close(resolve));
@@ -89,10 +89,10 @@ test('incomplete downloads fail and can be retried with a complete small PDF', a
     assert.equal(report[0].status, 'failed');
     assert.match(await fs.readFile(path.join(root, 'archive-issues.log'), 'utf8'), /completeness check/);
     assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /- \[ \] \*\*Download/);
-    await assert.rejects(fs.access(path.join(root, 'pdfs/test/download.pdf')), { code: 'ENOENT' });
+    await assert.rejects(fs.access(path.join(root, 'articles/download/source.pdf')), { code: 'ENOENT' });
     body = '%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n';
     assert.equal((await run(root)).code, 0);
-    assert.equal(await fs.readFile(path.join(root, 'pdfs/test/download.pdf'), 'utf8'), body);
+    assert.equal(await fs.readFile(path.join(root, 'articles/download/source.pdf'), 'utf8'), body);
     assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /No manual downloads pending/);
   } finally {
     await new Promise(resolve => server.close(resolve));
@@ -107,6 +107,7 @@ test('invalid entries and colliding paths fail before archiving with actionable 
     { articles: [null, article], message: /Article 1 must be an object/ },
     { articles: [article, { ...article, id: 'Same ID' }], message: /same PDF path/ },
     { articles: [article, { ...article }], message: /same PDF path/ },
+    { articles: [article, { ...article, category: 'another' }], message: /same PDF path/ },
     { articles: [{ ...article, category: '..' }], message: /invalid id or category/ },
   ];
   try {
@@ -119,7 +120,7 @@ test('invalid entries and colliding paths fail before archiving with actionable 
       const log = (await fs.readFile(path.join(root, 'archive-issues.log'), 'utf8')).trim().split('\n').map(JSON.parse);
       assert.match(log.at(-1).error, fixture.message);
       assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), fixture.message);
-      await assert.rejects(fs.access(path.join(root, 'pdfs')), { code: 'ENOENT' });
+      await assert.rejects(fs.access(path.join(root, 'articles')), { code: 'ENOENT' });
     }
   } finally { await fs.rm(root, { recursive: true, force: true }); }
 });
@@ -170,5 +171,36 @@ test('download deadline covers stalled headers and a continuously streaming body
   } finally {
     server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));
+  }
+});
+
+
+test('entries without URLs retain metadata and do not block other articles or local captures', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'archive-test-'));
+  const pdf = '%PDF-1.4\n%%EOF\n';
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'application/pdf' });
+    res.end(pdf);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const url = `http://127.0.0.1:${server.address().port}/article.pdf`;
+    await fs.writeFile(path.join(root, 'articles.yaml'), JSON.stringify({ articles: [
+      { id: 'book', title: 'Book', category: 'test', url: null, rating: null },
+      { id: 'online', title: 'Online', category: 'test', url },
+    ] }));
+    assert.equal((await run(root)).code, 1);
+    const report = JSON.parse(await fs.readFile(path.join(root, 'archive-report.json'), 'utf8'));
+    assert.deepEqual(report.map(item => item.status), ['failed', 'success']);
+    assert.match(report[0].error, /Source URL is missing/);
+    assert.match(await fs.readFile(path.join(root, 'articles/book/metadata.yaml'), 'utf8'), /url: null/);
+    assert.equal((await run(root, ['--refresh-manual-tasks'])).code, 0);
+    assert.match(await fs.readFile(path.join(root, 'manual-tasks-todo-for-me.md'), 'utf8'), /URL missing/);
+    await fs.writeFile(path.join(root, 'articles/book/source.pdf'), pdf);
+    assert.equal((await run(root)).code, 0, 'a local PDF works without a URL');
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+    await fs.rm(root, { recursive: true, force: true });
   }
 });

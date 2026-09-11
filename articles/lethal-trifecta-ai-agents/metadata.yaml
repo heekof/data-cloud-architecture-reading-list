@@ -1,0 +1,17 @@
+id: lethal-trifecta-ai-agents
+title: The Lethal Trifecta for AI Agents
+url: https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/
+category: llm-security
+rating: 8
+note: Simon Willison. Private data + untrusted content + external communication
+  = exploitable.
+personal_description: "Un LLM est mal gouverné s'il a au moins 2 de ces 3
+  trifecta : accès en READ à la data privée, accès en WRITE à l'extérieur et
+  communication externe untrusted."
+word_count: 1680
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null

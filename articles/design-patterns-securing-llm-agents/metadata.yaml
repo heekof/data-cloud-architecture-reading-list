@@ -1,0 +1,14 @@
+id: design-patterns-securing-llm-agents
+title: Design Patterns for Securing LLM Agents against Prompt Injections
+url: https://simonwillison.net/2025/Jun/13/prompt-injection-design-patterns/
+category: llm-security
+rating: 8
+note: Simon Willison. Six design patterns for agent security.
+personal_description: null
+word_count: 2161
+quality:
+  status: not_reviewed
+  issues: []
+quality_review:
+  status: pending
+  notes: null
