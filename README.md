@@ -715,3 +715,93 @@ Les deux fonctionnalités sont implémentées dans `src/library-workbench.mjs` e
 de l’interface locale. `npm test` vérifie notamment les décisions persistantes,
 les formulaires périmés, les exclusions, le budget, les références des extraits,
 la conservation des sources et les restrictions des nouvelles routes HTTP.
+
+### Découvrir des articles avec votre LLM, sans API
+
+L’onglet **Découvrir** organise un aller-retour manuel avec le LLM de votre choix.
+Le serveur ne contacte aucun modèle et ne nécessite aucune clé d’API.
+
+1. **Préparer la demande.** Indiquez un sujet et vos critères. La demande comporte
+   jusqu’à huit lectures les mieux notées, les catégories du dépôt et les titres/URL
+   des articles déjà connus. Elle ne contient ni le texte des articles ni les
+   descriptions personnelles. Vous pouvez la consulter avant de la copier.
+2. **Copier dans votre LLM.** Utilisez une interface disposant de recherche web.
+   La demande exige des URL réelles, une contribution justifiée, les limites et
+   un niveau d’accès déclaré. Elle demande au maximum cinq articles et un objet
+   JSON strict. Un LLM sans navigation est invité à ne pas inventer de liens et
+   à retourner une liste vide.
+3. **Importer la réponse.** Collez le JSON complet. Un bloc de code Markdown marqué
+   JSON est toléré autour de l’objet, mais pas un texte explicatif autour.
+   L’import est validé en entier avant enregistrement : types, clés, longueurs,
+   niveau d’accès et URL HTTP/HTTPS sans identifiants. Les erreurs sont affichées
+   sans remplacer la boîte existante.
+4. **Examiner les propositions.** Ouvrez les sources et vérifiez les justifications.
+   L’outil affiche ce que le LLM déclare avoir consulté ; il ne vérifie pas lui-même
+   l’existence du lien, la citation ni la pertinence. Choisissez **Plus tard**,
+   **Écarter**, **Réexaminer** ou **Ajouter à la bibliothèque**.
+5. **Archiver les articles acceptés.** L’ajout inscrit l’article dans `articles.yaml`,
+   crée ses métadonnées et actualise les rapports. Sa note reste vide : le LLM
+   n’attribue pas votre note personnelle. Lancez ensuite `npm run archive` pour
+   récupérer les sources, extraire le Markdown et mettre la recherche à jour.
+   L’import et l’acceptation ne lancent pas de téléchargement automatiquement.
+
+Format de réponse attendu (exemple de structure uniquement) :
+
+```json
+{
+  "version": 1,
+  "topic": "Sujet de recherche",
+  "articles": [
+    {
+      "title": "Titre exact de l’article",
+      "url": "https://example.org/article",
+      "category": "data-engineering",
+      "reason": "Pourquoi cet article répond au sujet",
+      "contribution": "Ce qu’il ajoute aux lectures existantes",
+      "caveats": "Limites ou informations inaccessibles",
+      "access": "full_text",
+      "evidence": "Court extrait réellement observé"
+    }
+  ]
+}
+```
+
+`version` doit être le nombre `1`. `topic` et les huit champs de chaque article
+sont des chaînes ; toutes les clés sont obligatoires. `caveats` et `evidence`
+peuvent être vides. `access` accepte uniquement `full_text`, `abstract` ou
+`metadata`. Une liste `articles` vide est valide. La demande vise cinq propositions ;
+l’import tolère jusqu’à vingt articles et 24 Ko de JSON. Il refuse les clés
+supplémentaires. La demande impose un extrait justificatif d’au plus 25 mots,
+à vérifier lors de la revue humaine.
+
+Les doublons sont détectés dans la bibliothèque et dans la boîte, y compris les
+propositions écartées. La comparaison des URL ignore le protocole HTTP/HTTPS,
+les fragments, le slash final et les paramètres de suivi courants, mais conserve
+les paramètres de contenu. Les titres similaires sont signalés pour vérification,
+sans être bloqués automatiquement. Les redirections vers une même page ne sont
+pas résolues automatiquement.
+
+Les propositions et leurs décisions sont conservées dans
+`discovery/candidates.json`, créé au premier import non vide et versionnable dans
+Git. Rien n’est créé dans ce dossier par la seule préparation d’une demande.
+La boîte conserve la justification d’origine du LLM ; elle ne la transforme pas
+en description personnelle de l’article. Les décisions survivent au rechargement
+et une réimportation ne les réinitialise pas. La boîte du POC est limitée à 500
+propositions. Une modification concurrente détectée impose de l’actualiser avant
+une nouvelle action. Évitez les éditions externes simultanées pendant l’ajout.
+
+L’acceptation recontrôle les doublons et génère un ID sans collision avec les
+articles ou dossiers existants. Une seconde acceptation de la même URL rattache
+la proposition à l’article déjà présent. Les originaux restent intacts ; aucun
+faux Markdown n’est créé. Si une actualisation dérivée échoue après l’ajout,
+l’interface le signale et l’archivage permet de reprendre le traitement.
+
+Implémentation : `src/discovery.mjs`, `web/search/discovery.js` et les routes du
+serveur local. `test/discovery.test.mjs` couvre le contrat JSON, les doublons,
+les décisions persistantes, les formulaires périmés, l’ajout idempotent,
+la conservation des sources et les restrictions HTTP. Lancez `npm test` pour
+vérifier l’ensemble. Pour valider la qualité des recommandations, essayez quelques
+sujets réels : les tests logiciels ne mesurent pas la qualité des choix du LLM.
+
+Après un import contenant de nouvelles propositions, la vue passe automatiquement
+à **À examiner** pour les rendre visibles, même si un autre filtre était actif.

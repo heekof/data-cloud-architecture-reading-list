@@ -124,6 +124,7 @@ $('previous').addEventListener('click', () => { page--; search({ keepPage: true 
 $('next').addEventListener('click', () => { page++; search({ keepPage: true }); });
 async function init() {
   initWorkbench();
+  initDiscovery();
   try {
     const stats = await get('/api/stats');
     $('stat-articles').textContent = number(stats.articles); $('stat-words').textContent = number(stats.words);

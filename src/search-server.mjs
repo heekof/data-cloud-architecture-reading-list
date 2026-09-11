@@ -1,3 +1,4 @@
+import { discoveryPrompt, discoveryInbox, createDiscoveryWriter } from './discovery.mjs';
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -6,10 +7,17 @@ import { readConfiguration, articlePdfPath } from './article-library.mjs';
 import { reviewQueue, createReviewWriter, exportContext } from './library-workbench.mjs';
 import { indexCorpus, searchCorpus, corpusStats } from './search-index.mjs';
 
-const assets = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']], ['/workbench.js', ['workbench.js', 'text/javascript']]]);
+const assets = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']], ['/workbench.js', ['workbench.js', 'text/javascript']], ['/discovery.js', ['discovery.js', 'text/javascript']]]);
 const webRoot = fileURLToPath(new URL('../web/search/', import.meta.url));
 export function createSearchServer(root) {
   const saveReview = createReviewWriter(root);
+  const writeDiscovery = createDiscoveryWriter(root);
+  let mutationTail = Promise.resolve();
+  const serializeMutation = work => {
+    const result = mutationTail.then(work);
+    mutationTail = result.catch(() => {});
+    return result;
+  };
   return http.createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Cache-Control', 'no-store');
@@ -20,7 +28,7 @@ export function createSearchServer(root) {
     try {
       const url = new URL(req.url, 'http://127.0.0.1');
       if (req.method === 'POST') {
-        if (!['/api/review', '/api/context'].includes(url.pathname)) return json(405, { error: 'Méthode non autorisée.' });
+        if (!['/api/review', '/api/context', '/api/discovery/prompt', '/api/discovery/import', '/api/discovery/decision', '/api/discovery/accept'].includes(url.pathname)) return json(405, { error: 'Méthode non autorisée.' });
         if (req.headers.origin !== `http://${req.headers.host}` || req.headers['x-library-action'] !== '1' || !req.headers['content-type']?.startsWith('application/json')) return json(403, { error: 'Cette action doit provenir de l’interface locale.' });
         const payload = []; let bytes = 0;
         for await (const chunk of req) {
@@ -31,8 +39,11 @@ export function createSearchServer(root) {
         let body;
         try { body = JSON.parse(Buffer.concat(payload).toString('utf8')); }
         catch { return json(400, { error: 'Requête JSON invalide.' }); }
-        return json(200, url.pathname === '/api/review' ? await saveReview(body) : await exportContext(root, body));
+        if (url.pathname === '/api/discovery/prompt') return json(200, await discoveryPrompt(root, body));
+        if (url.pathname.startsWith('/api/discovery/')) return json(200, await serializeMutation(() => writeDiscovery(url.pathname.split('/').at(-1), body)));
+        return json(200, url.pathname === '/api/review' ? await serializeMutation(() => saveReview(body)) : await exportContext(root, body));
       }
+      if (url.pathname === '/api/discovery') return json(200, await discoveryInbox(root));
       if (url.pathname === '/api/reviews') return json(200, await reviewQueue(root));
       if (assets.has(url.pathname)) {
         const [file, type] = assets.get(url.pathname);

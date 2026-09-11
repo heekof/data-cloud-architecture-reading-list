@@ -106,10 +106,12 @@ async function loadReviews() {
 }
 function initWorkbench() {
   for (const button of document.querySelectorAll('[data-view]')) button.addEventListener('click', () => {
-    const reviews = button.dataset.view === 'reviews';
-    $('search-section').hidden = reviews; $('search-workspace').hidden = reviews; $('review-workspace').hidden = !reviews;
+    const view = button.dataset.view;
+    $('search-section').hidden = view !== 'search'; $('search-workspace').hidden = view !== 'search';
+    $('review-workspace').hidden = view !== 'reviews'; $('discovery-workspace').hidden = view !== 'discovery';
     for (const tab of document.querySelectorAll('[data-view]')) tab.setAttribute('aria-pressed', String(tab === button));
-    if (reviews) loadReviews();
+    if (view === 'reviews') loadReviews();
+    if (view === 'discovery') loadDiscovery();
   });
   $('review-filter').addEventListener('change', renderReviews);
   $('review-query').addEventListener('input', renderReviews);
