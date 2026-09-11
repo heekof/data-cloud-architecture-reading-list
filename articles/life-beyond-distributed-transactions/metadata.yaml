@@ -12,12 +12,10 @@ ai_summary: "Un cadre de réflexion pour concevoir des applications distribuées
   sans supposer une transaction globale : délimiter les entités, conserver des
   transactions locales et expliciter la coordination par messages entre ces
   entités."
-word_count: null
+word_count: 7667
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

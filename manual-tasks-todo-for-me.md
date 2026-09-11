@@ -18,114 +18,34 @@ Run `npm run archive:tasks` to refresh this checklist without downloading, or `n
 - [ ] **Cloud Native Platforms: Run**
   - Source: <https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-run/4520188>
   - Save as: `articles/cloud-native-platforms-run/source.pdf`
-  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260908T192047Z-15cbf85dc6497tdwhC1PAR39ec0000000rng0000000039fs
+  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260911T065309Z-15dd6945bb78jq2phC1PAR7q3400000008kg0000000032tv
 
 - [ ] **Cloud Native Platforms: Evolve**
   - Source: <https://techcommunity.microsoft.com/blog/azurearchitectureblog/cloud-native-platforms-evolve/4520195>
   - Save as: `articles/cloud-native-platforms-evolve/source.pdf`
-  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260908T192049Z-15cbf85dc64qgdrxhC1PARnyxn0000000reg00000000330v
+  - Issue: HTTP 403 | Title: Service unavailable | Body preview: The request is blocked. 20260911T065310Z-15dd6945bb7fk6mrhC1PAR6wr00000000feg000000003dn6
 
 - [ ] **Designing Data-Intensive Applications**
   - Source: URL missing; add it to articles.yaml or supply a PDF manually.
   - Save as: `articles/designing-data-intensive-applications/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **MapReduce: Simplified Data Processing on Large Clusters**
-  - Source: <https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf>
-  - Save as: `articles/mapreduce-simplified-data-processing/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
+  - Issue: Source URL is missing; add it to articles.yaml or save a PDF manually.
 
 - [ ] **Apache Iceberg: The Definitive Guide**
   - Source: URL missing; add it to articles.yaml or supply a PDF manually.
   - Save as: `articles/apache-iceberg-definitive-guide/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
+  - Issue: Source URL is missing; add it to articles.yaml or save a PDF manually.
 
 - [ ] **Data Mesh**
   - Source: URL missing; add it to articles.yaml or supply a PDF manually.
   - Save as: `articles/data-mesh/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
+  - Issue: Source URL is missing; add it to articles.yaml or save a PDF manually.
 
 - [ ] **Site Reliability Engineering**
   - Source: URL missing; add it to articles.yaml or supply a PDF manually.
   - Save as: `articles/site-reliability-engineering/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
+  - Issue: Source URL is missing; add it to articles.yaml or save a PDF manually.
 
 - [ ] **The Architect Elevator**
   - Source: URL missing; add it to articles.yaml or supply a PDF manually.
   - Save as: `articles/the-architect-elevator/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Evolutionary Database Design**
-  - Source: <https://martinfowler.com/articles/evodb.html>
-  - Save as: `articles/evolutionary-database-design/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **What I Talk About When I Talk About Platforms**
-  - Source: <https://martinfowler.com/articles/talk-about-platforms.html>
-  - Save as: `articles/what-i-talk-about-when-i-talk-about-platforms/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Designing Data Products**
-  - Source: <https://martinfowler.com/articles/designing-data-products.html>
-  - Save as: `articles/designing-data-products/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Your AI Product Needs Evals**
-  - Source: <https://hamel.dev/blog/posts/evals/>
-  - Save as: `articles/your-ai-product-needs-evals/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Life Beyond Distributed Transactions: An Apostate's Opinion**
-  - Source: <https://www.cidrdb.org/cidr2007/papers/cidr07p15.pdf>
-  - Save as: `articles/life-beyond-distributed-transactions/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **What Do You Mean by Event-Driven?**
-  - Source: <https://martinfowler.com/articles/201701-event-driven.html>
-  - Save as: `articles/what-do-you-mean-by-event-driven/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Building Effective Agents**
-  - Source: <https://www.anthropic.com/engineering/building-effective-agents>
-  - Save as: `articles/building-effective-agents/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **The Laws of Frugal Architecture**
-  - Source: <https://thefrugalarchitect.com/laws/>
-  - Save as: `articles/laws-of-frugal-architecture/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Governing Data Products Using Fitness Functions**
-  - Source: <https://martinfowler.com/articles/fitness-functions-data-products.html>
-  - Save as: `articles/governing-data-products-using-fitness-functions/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Static Stability Using Availability Zones**
-  - Source: <https://aws.amazon.com/builders-library/static-stability-using-availability-zones/>
-  - Save as: `articles/static-stability-using-availability-zones/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **The Quest for Semantic Architecture**
-  - Source: <https://commonsensedata.substack.com/p/the-quest-for-semantic-architecture>
-  - Save as: `articles/the-quest-for-semantic-architecture/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **(Naive) Reuse Considered Harmful?**
-  - Source: <https://architectelevator.com/architecture/reuse-harmful/>
-  - Save as: `articles/naive-reuse-considered-harmful/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Don't get locked up into avoiding lock-in**
-  - Source: <https://martinfowler.com/articles/oss-lockin.html>
-  - Save as: `articles/dont-get-locked-up-into-avoiding-lock-in/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **The problem was the product**
-  - Source: <https://benn.substack.com/p/the-problem-was-the-product>
-  - Save as: `articles/the-problem-was-the-product/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
-
-- [ ] **Ironies of Automation**
-  - Source: <https://tc.ifac-control.org/4/1/newsletter/ironies-of-automation/@@download/file/Bainbridge1983_Automatica_Ironies%20of%20automation.pdf>
-  - Save as: `articles/ironies-of-automation/source.pdf`
-  - Issue: PDF is missing; no recorded download error.
+  - Issue: Source URL is missing; add it to articles.yaml or save a PDF manually.

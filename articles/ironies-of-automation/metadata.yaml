@@ -14,12 +14,10 @@ ai_summary: L'automatisation retire aux opérateurs une partie de la pratique qu
   les situations les plus difficiles. Une supervision efficace exige donc de
   préserver la compréhension du système, le contexte de l'incident et
   l'entraînement aux interventions rares.
-word_count: null
+word_count: 5961
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

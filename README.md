@@ -19,6 +19,8 @@ depth alone.
 
 - `articles.yaml` — **starting point**. Machine-readable list of articles to
   archive as PDFs.
+- `src/update-library.mjs` — single-command workflow for downloading, extracting,
+  synchronizing metadata, and generating reports.
 - `src/archive-articles.mjs` — Node script that reads `articles.yaml` and
   produces one PDF per article under `articles/<id>/source.pdf`.
 - `articles/<id>/` — source documents, extracted Markdown when available, and
@@ -142,6 +144,23 @@ preserved in [articles/README.md](articles/README.md).
 
 ### End-to-end maintenance procedure
 
+After the first-time setup, **`npm run archive` runs the full workflow**. It
+sequentially downloads missing PDFs, extracts missing Markdown, synchronizes
+metadata and word counts, and regenerates the quality report, inventory tables,
+and manual download checklist. Existing complete PDFs and existing Markdown are
+preserved. Download failures do not stop extraction of successful downloads or
+report generation; a nonzero final exit code and per-step summary keep failures
+visible. An interrupted child process stops the remaining steps.
+
+The combined output is saved to `pipeline.log` after completion (git-ignored,
+replaced on each run). Download history remains in `archive-issues.log`, the latest
+capture results in `archive-report.json`, download interventions in
+`manual-tasks-todo-for-me.md`, and content/extraction review needs in
+`article-quality.md`. The command does not invent missing URLs, perform OCR,
+repair truncated sources, or approve content automatically.
+
+The following steps explain the workflow and how to run individual stages:
+
 1. **Prepare the tools.** From the repository root, run `npm ci` to install the
    locked Node dependencies. PDF extraction additionally requires Poppler; on
    macOS install it with `brew install poppler`, then check `pdftotext -v`.
@@ -150,7 +169,7 @@ preserved in [articles/README.md](articles/README.md).
    globally unique and stable. Preserve unknown ratings and URLs as `null`.
    Run `npm run metadata:sync` to create/update article folders and metadata.
 3. **Supply sources and extract text.** Save an available original PDF as
-   `articles/<id>/source.pdf`, or run `npm run archive` to download missing
+   `articles/<id>/source.pdf`, or run `npm run archive:pdf` to download missing
    sources (this step uses the network and may need the browser setup below).
    Preserve original files. Then run `npm run extract`; for a selected source,
    use `npm run extract -- --id=<article-id>`. Existing Markdown is skipped,
@@ -289,10 +308,10 @@ include:
 1. Add an entry to `articles.yaml`:
 
    ```yaml
-   - id: my-article-slug          # required, used as the PDF filename
+   - id: my-article-slug          # required, stable article folder ID
      title: "My Article Title"    # required
      url: "https://example.com/…" # required for download; use null if unknown; direct .pdf URLs supported
-     category: cloud-architecture # required, becomes the output subfolder
+     category: cloud-architecture # required, classification metadata
      rating: 9                    # optional
    ```
 
@@ -320,9 +339,16 @@ npm ci
 npx playwright install chromium
 ```
 
+PDF text extraction also requires Poppler. On macOS:
+
+```bash
+brew install poppler
+pdftotext -v
+```
+
 This setup is already complete on this Mac.
 
-### Run the archiver
+### Run everything with one command
 
 After adding or updating entries in `articles.yaml`, run:
 
@@ -330,11 +356,22 @@ After adding or updating entries in `articles.yaml`, run:
 npm run archive
 ```
 
-The equivalent direct command is `node src/archive-articles.mjs`.
-Existing complete PDFs are skipped; missing articles are downloaded into `articles/<id>/source.pdf`.
-At the end, the terminal shows succeeded, skipped, blocked, and failed counts.
-Check `archive-report.json` for the latest results and
-`manual-tasks-todo-for-me.md` for downloads requiring your attention.
+The equivalent direct command is `node src/update-library.mjs`.
+This runs the entire workflow, including PDF capture, Markdown extraction,
+metadata/word counts, quality flags, the Markdown/CSV inventory, and manual tasks.
+Open `articles-overview.md` for the refreshed overview, `article-quality.md` for
+review needs, and `manual-tasks-todo-for-me.md` for downloads requiring attention.
+Check `pipeline.log` for all step output and errors from the completed run.
+
+To run only one stage, the separate commands remain available:
+
+| Command | Scope |
+|---|---|
+| `npm run archive:pdf` | Download/render missing PDFs and refresh download logs/tasks |
+| `npm run extract` | Extract missing Markdown and refresh metadata/quality |
+| `npm run metadata:sync` | Refresh metadata, word counts, and quality |
+| `npm run articles:report` | Refresh metadata/quality and generate Markdown/CSV inventory |
+| `npm run archive:tasks` | Refresh download tasks from the previous report, without downloading |
 
 ### Refresh manual tasks without downloading
 
@@ -349,7 +386,7 @@ Run the archiver at least once before using this command.
 
 ## Archiving articles as PDFs
 
-The script:
+The capture stage (`npm run archive:pdf`), also run by the complete workflow:
 
 - Skips any article whose PDF passes a basic header/end-marker check at
   `articles/<id>/source.pdf` (preserve the existing source elsewhere before requesting a fresh capture).

@@ -9,12 +9,10 @@ personal_description: null
 ai_summary: Permettre au schéma et aux données d'une base de production
   d'évoluer au même rythme que le code applicatif grâce au versioning des
   migrations, au refactoring automatisé et à l'intégration continue.
-word_count: null
+word_count: 9603
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

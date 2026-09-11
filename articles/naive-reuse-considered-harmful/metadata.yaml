@@ -13,12 +13,10 @@ ai_summary: "Une fonctionnalité commune ne justifie pas toujours une instance
   d'authentification lorsqu'elles utilisent les mêmes ressources. Concevoir la
   mutualisation exige de considérer les besoins de latence, de fiabilité et
   d'isolation, au-delà de la simplicité du diagramme."
-word_count: null
+word_count: 1250
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

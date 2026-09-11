@@ -11,12 +11,10 @@ ai_summary: Préparer un système à continuer de fonctionner pendant une panne
   avec les ressources déjà disponibles. Séparer le fonctionnement courant du
   plan de contrôle et éviter que la reprise dépende du provisionnement immédiat
   de nouvelles ressources.
-word_count: null
+word_count: 5329
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

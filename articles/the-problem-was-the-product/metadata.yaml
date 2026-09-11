@@ -14,12 +14,10 @@ ai_summary: Assembler d'excellents outils ne produit pas automatiquement un
   décision. Stancil critique la fragmentation du modern data stack, où certaines
   responsabilités se chevauchent tandis que d'autres restent sans propriétaire,
   et invite à évaluer l'expérience complète.
-word_count: null
+word_count: 4123
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

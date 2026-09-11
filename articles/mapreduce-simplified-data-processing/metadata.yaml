@@ -9,12 +9,10 @@ personal_description: null
 ai_summary: "Le papier fondateur de Google sur le traitement de données
   distribué : diviser le travail en map et reduce, exécuter en parallèle sur des
   milliers de machines. La base de tout le big data moderne."
-word_count: null
+word_count: 9054
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null

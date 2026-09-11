@@ -11,12 +11,10 @@ ai_summary: Améliorer un produit IA demande de rendre ses erreurs observables e
   de mesurer les progrès avec des évaluations adaptées au métier. L'article
   combine tests, inspection des traces et évaluations humaines ou automatisées,
   avec une application au RAG.
-word_count: null
+word_count: 4274
 quality:
-  status: needs_review
-  issues:
-    - missing_source
-    - missing_markdown
+  status: not_reviewed
+  issues: []
 quality_review:
   status: pending
   notes: null
