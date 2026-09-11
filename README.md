@@ -152,8 +152,11 @@ preserved. Download failures do not stop extraction of successful downloads or
 report generation; a nonzero final exit code and per-step summary keep failures
 visible. An interrupted child process stops the remaining steps.
 
-The combined output is saved to `pipeline.log` after completion (git-ignored,
-replaced on each run). Download history remains in `archive-issues.log`, the latest
+The combined output is written progressively to `pipeline.log` (git-ignored,
+replaced at the start of each validated run). `Ctrl+C` and termination signals
+record the interruption, stop the current child process, and prevent later steps
+from starting. A child that does not stop is forcibly terminated after five seconds.
+Download history remains in `archive-issues.log`, the latest
 capture results in `archive-report.json`, download interventions in
 `manual-tasks-todo-for-me.md`, and content/extraction review needs in
 `article-quality.md`. The command does not invent missing URLs, perform OCR,
@@ -361,7 +364,7 @@ This runs the entire workflow, including PDF capture, Markdown extraction,
 metadata/word counts, quality flags, the Markdown/CSV inventory, and manual tasks.
 Open `articles-overview.md` for the refreshed overview, `article-quality.md` for
 review needs, and `manual-tasks-todo-for-me.md` for downloads requiring attention.
-Check `pipeline.log` for all step output and errors from the completed run.
+Check `pipeline.log` for step output and errors, including an interrupted run.
 
 To run only one stage, the separate commands remain available:
 
@@ -390,10 +393,18 @@ The capture stage (`npm run archive:pdf`), also run by the complete workflow:
 
 - Skips any article whose PDF passes a basic header/end-marker check at
   `articles/<id>/source.pdf` (preserve the existing source elsewhere before requesting a fresh capture).
-- Uses Playwright (headless Chromium) to render HTML pages to PDF.
-- Detects PDF responses by their `application/pdf` content-type, including
-  download links without a `.pdf` ending and redirects. Downloads must pass
-  the PDF header/end-marker check. A 60-second deadline covers response headers
+- Publishes both downloaded and browser-generated PDFs through a temporary file
+  on the same filesystem, using an atomic hard link that refuses to replace an
+  existing destination. If another process or a manual action creates the source
+  during capture, that file is preserved and the run reports the conflict.
+- Uses Playwright (headless Chromium) to render HTML pages to PDF. Generated PDFs
+  use the same header/end-marker check; small valid captures are not deleted
+  merely because they are below a size threshold.
+- Accepts declared PDF responses, generic binary downloads, responses with no
+  content-type, and PDF-named attachments, including extensionless URLs and
+  redirects. Response headers alone never establish that a download is a PDF:
+  the downloaded bytes must pass the PDF header/end-marker check. A 60-second
+  deadline covers response headers
   and the full download; timeouts are logged for manual recovery.
 - Writes a summary to `archive-report.json` with one entry per article and a
   `status` of `success`, `skipped`, `blocked` (HTTP 401/403), or `failed`.

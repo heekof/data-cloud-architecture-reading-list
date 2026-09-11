@@ -8,6 +8,28 @@ export function isCompletePdf(buffer) {
     buffer.subarray(-1024).includes(Buffer.from("%%EOF"));
 }
 
+// Stage on the destination filesystem, then publish with an atomic no-clobber link.
+// A file created by another process while downloading must never be replaced.
+export async function publishPdf(filename, buffer) {
+  if (!isCompletePdf(buffer)) throw new Error("PDF failed the completeness check; no source was published.");
+  await fs.mkdir(path.dirname(filename), { recursive: true });
+  const temporaryDirectory = await fs.mkdtemp(path.join(path.dirname(filename), ".pdf-capture-"));
+  try {
+    const temporaryFile = path.join(temporaryDirectory, "capture.pdf");
+    await fs.writeFile(temporaryFile, buffer, { flag: "wx" });
+    try {
+      await fs.link(temporaryFile, filename);
+    } catch (error) {
+      if (error.code === "EEXIST") {
+        throw new Error(`A file appeared during capture and was preserved: ${filename}. Rerun to inspect or skip it.`, { cause: error });
+      }
+      throw error;
+    }
+  } finally {
+    await fs.rm(temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
 export async function inspectPdf(filename) {
   let buffer;
   try {
@@ -67,17 +89,23 @@ export async function fetchPdfBuffer(url, { required = false, timeoutMs = 60000 
   try {
     response = await fetch(url, { signal });
     const contentType = response.headers.get("content-type") || "";
-    const isPdf = contentType.toLowerCase().split(";")[0].trim() === "application/pdf";
-    // Leave HTML responses (including browser challenges) to Playwright.
-    if (!isPdf && !required) return null;
+    const mime = contentType.toLowerCase().split(";")[0].trim();
+    const isPdf = ["application/pdf", "application/x-pdf"].includes(mime);
+    const disposition = response.headers.get("content-disposition") || "";
+    const pdfAttachment = /filename\*?\s*=\s*[^;]*\.pdf(?:["'\s;]|$)/i.test(disposition);
+    const binary = ["application/octet-stream", "binary/octet-stream", ""].includes(mime);
+    // Leave ordinary HTML responses (including browser challenges) to Playwright.
+    if (!isPdf && !required && !binary && !pdfAttachment) return null;
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status} ${response.statusText}`);
       error.httpStatus = response.status;
       throw error;
     }
-    if (!isPdf) throw new Error(`Expected a PDF but received: ${contentType || "unknown content type"}`);
     const buffer = Buffer.from(await response.arrayBuffer());
     if (!isCompletePdf(buffer)) {
+      // A generic or missing MIME type alone does not establish that this is a PDF.
+      const hasPdfHeader = buffer.subarray(0, 5).toString() === "%PDF-";
+      if (!isPdf && !required && !pdfAttachment && !hasPdfHeader) return null;
       throw new Error("Downloaded content failed the PDF completeness check (missing %PDF- header or %%EOF end marker).");
     }
     return buffer;

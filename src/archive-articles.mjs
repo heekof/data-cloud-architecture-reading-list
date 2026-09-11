@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { chromium } from "playwright";
 import { readConfiguration, sanitizeSegment, articlePdfPath, syncMetadata } from "./article-library.mjs";
-import { fetchPdfBuffer, inspectPdf, logIssue, writeManualTasks } from "./archive-support.mjs";
+import { fetchPdfBuffer, inspectPdf, logIssue, writeManualTasks, publishPdf } from "./archive-support.mjs";
 
 const ROOT = process.cwd();
 const OUTPUT_ROOT = path.join(ROOT, "articles");
@@ -182,7 +182,7 @@ async function downloadDirectPdf(article, buffer) {
   console.log(`Downloading PDF: ${article.title || id}`);
   console.log(`  URL: ${article.url}`);
 
-  await fs.writeFile(outputPath, buffer);
+  await publishPdf(outputPath, buffer);
 
   console.log(
     `  Created: ${path.relative(ROOT, outputPath)}`,
@@ -284,8 +284,7 @@ async function archiveArticle(browser, article) {
 
     const sourceUrl = article.url;
 
-    await page.pdf({
-      path: outputPath,
+    const buffer = await page.pdf({
       format: "A4",
       printBackground: true,
       preferCSSPageSize: false,
@@ -332,17 +331,8 @@ async function archiveArticle(browser, article) {
       outline: true,
     });
 
-    const stats = await fs.stat(outputPath);
-
-    if (stats.size < 10000) {
-      await fs.rm(outputPath, {
-        force: true,
-      });
-
-      throw new Error(
-        `Generated PDF is suspiciously small: ${stats.size} bytes.`,
-      );
-    }
+    await publishPdf(outputPath, buffer);
+    const stats = { size: buffer.length };
 
     console.log(
       `  Created: ${path.relative(ROOT, outputPath)}`,

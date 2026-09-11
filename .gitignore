@@ -3,3 +3,4 @@ node_modules/
 archive-report.json
 *:sec.endpointdlp
 pipeline.log
+.pdf-capture-*/
