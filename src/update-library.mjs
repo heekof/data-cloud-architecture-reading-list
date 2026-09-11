@@ -8,6 +8,7 @@ const steps = [
   { name: 'Archive missing PDFs', script: './archive-articles.mjs' },
   { name: 'Extract missing Markdown', script: './extract-articles.mjs' },
   { name: 'Refresh metadata and reports', script: './generate-article-report.mjs' },
+  { name: 'Update search index', script: './index-search.mjs' },
 ];
 
 let logFile;

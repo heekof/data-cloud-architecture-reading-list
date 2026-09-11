@@ -4,3 +4,6 @@ archive-report.json
 *:sec.endpointdlp
 pipeline.log
 .pdf-capture-*/
+
+# Derived local full-text index
+.search/

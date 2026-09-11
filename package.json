@@ -10,7 +10,9 @@
     "metadata:sync": "node src/sync-metadata.mjs",
     "extract": "node src/extract-articles.mjs",
     "articles:report": "node src/generate-article-report.mjs",
-    "archive:pdf": "node src/archive-articles.mjs"
+    "archive:pdf": "node src/archive-articles.mjs",
+    "search": "node src/search-server.mjs",
+    "search:index": "node src/index-search.mjs"
   },
   "repository": {
     "type": "git",

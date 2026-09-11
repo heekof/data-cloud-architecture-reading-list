@@ -147,7 +147,8 @@ preserved in [articles/README.md](articles/README.md).
 After the first-time setup, **`npm run archive` runs the full workflow**. It
 sequentially downloads missing PDFs, extracts missing Markdown, synchronizes
 metadata and word counts, and regenerates the quality report, inventory tables,
-and manual download checklist. Existing complete PDFs and existing Markdown are
+and manual download checklist, then updates the local full-text search index.
+Existing complete PDFs and existing Markdown are
 preserved. Download failures do not stop extraction of successful downloads or
 report generation; a nonzero final exit code and per-step summary keep failures
 visible. An interrupted child process stops the remaining steps.
@@ -349,6 +350,10 @@ brew install poppler
 pdftotext -v
 ```
 
+The search index also requires SQLite 3.35+ with FTS5 (`sqlite3 --version`).
+On macOS, install it with `brew install sqlite` if needed. The `SQLITE3` environment
+variable can select a custom executable.
+
 This setup is already complete on this Mac.
 
 ### Run everything with one command
@@ -361,7 +366,8 @@ npm run archive
 
 The equivalent direct command is `node src/update-library.mjs`.
 This runs the entire workflow, including PDF capture, Markdown extraction,
-metadata/word counts, quality flags, the Markdown/CSV inventory, and manual tasks.
+metadata/word counts, quality flags, the Markdown/CSV inventory, manual tasks,
+and the local search index.
 Open `articles-overview.md` for the refreshed overview, `article-quality.md` for
 review needs, and `manual-tasks-todo-for-me.md` for downloads requiring attention.
 Check `pipeline.log` for step output and errors, including an interrupted run.
@@ -375,6 +381,8 @@ To run only one stage, the separate commands remain available:
 | `npm run metadata:sync` | Refresh metadata, word counts, and quality |
 | `npm run articles:report` | Refresh metadata/quality and generate Markdown/CSV inventory |
 | `npm run archive:tasks` | Refresh download tasks from the previous report, without downloading |
+| `npm run search:index` | Update the derived full-text index without downloading |
+| `npm run search` | Update the index and open a local web server for searching |
 
 ### Refresh manual tasks without downloading
 
@@ -527,3 +535,88 @@ External articles and linked resources remain the property of their respective
 authors and publishers.
 
 See LICENSE for details.
+
+## Recherche locale dans le corpus (POC)
+
+Une interface web permet de retrouver des passages dans les titres et les textes
+`articles/<id>/article.md`, puis de lire le passage dans son contexte ou d’ouvrir
+le PDF et le site d’origine. Les documents originaux ne sont pas modifiés.
+
+### Démarrer
+
+Prérequis : les dépendances Node du projet et **SQLite 3.35 ou plus récent avec
+FTS5**, accessible par la commande `sqlite3`. Sur macOS, vérifiez l’installation
+avec `sqlite3 --version` ; si nécessaire, installez SQLite via `brew install sqlite`.
+La variable `SQLITE3` permet de choisir un autre exécutable.
+
+```sh
+npm ci
+npm run search
+```
+
+Ouvrez <http://127.0.0.1:4317>. L’index est actualisé au démarrage. Le serveur est
+accessible uniquement sur votre ordinateur. Arrêtez-le avec Ctrl+C. Pour changer
+le port : `PORT=4318 npm run search`.
+
+### Chercher et lire
+
+- Saisissez des mots, par exemple `idempotency` ou `governance`, puis appuyez sur
+  Entrée. Tous les mots doivent apparaître dans un même passage ou son titre.
+- Entourez une expression de guillemets : `"data contracts"`. La casse et les
+  accents ne bloquent pas les correspondances. Il n’y a ni traduction automatique,
+  ni recherche par synonymes, ni réponse générée par un LLM ; le corpus étant
+  principalement anglais, privilégiez des termes anglais.
+- Affinez par catégorie, note minimale et état qualité. Une recherche sans texte
+  parcourt les articles par note ; une recherche textuelle les classe par
+  pertinence. Les articles sans note sont exclus quand une note minimale est fixée.
+- Chaque article apparaît une fois, avec son meilleur passage, le nombre de
+  passages correspondants et les mots surlignés. « Lire le passage » ouvre un
+  panneau de lecture positionné sur la plage de lignes correspondante. Échap
+  ferme le panneau. Le lecteur affiche le texte sans exécuter le HTML contenu
+  dans un article ; il ne reproduit pas toute la mise en page Markdown.
+- Les sources explicitement rejetées sont masquées par défaut ; une case permet
+  de les inclure avec un avertissement. « Non revu » ne signifie pas validé.
+  Les articles sans Markdown ne sont pas recherchables : consultez les rapports
+  de qualité et de tâches manuelles pour les compléter.
+
+### Actualiser et vérifier
+
+```sh
+npm run archive       # récupération, extraction, rapports, puis index de recherche
+npm run search:index  # actualiser uniquement l’index après une correction locale
+npm test              # tests existants et tests de recherche sur un corpus fictif
+```
+
+L’archivage actualise l’index même si certaines récupérations échouent, sauf en
+cas d’interruption. Une fois l’index actualisé, relancez votre recherche dans
+l’interface déjà ouverte ; rechargez la page pour rafraîchir aussi les statistiques
+et catégories. Le résultat de l’indexation figure dans le journal `pipeline.log`
+lorsqu’elle est lancée par l’archivage.
+
+### Fonctionnement et limites du POC
+
+L’index SQLite FTS5 est généré dans `.search/corpus.sqlite`, ignoré par Git et
+reconstructible. Les métadonnées centrales viennent de `articles.yaml`, les états
+qualité de chaque `metadata.yaml`, et les compteurs du Markdown réellement lu.
+Une empreinte du texte et des métadonnées évite de réindexer les articles
+inchangés. Les entrées devenues absentes sont retirées de l’index, sans supprimer
+les fichiers sources.
+
+Le texte est découpé autour des titres et paragraphes, avec un objectif de 50
+mots par passage au total, en conservant les numéros de ligne. La dernière ligne
+est conservée entière : le passage peut donc dépasser légèrement cette cible
+(ou davantage si le fichier contient une très longue ligne). Le lecteur garde
+l’article complet accessible autour de la zone mise en évidence. Une modification
+de la configuration du découpage déclenche la reconstruction des passages à la
+prochaine indexation. Le classement utilise BM25
+avec un poids plus fort pour le titre. Les résultats sont regroupés par article
+et paginés. Les expressions à cheval sur deux passages ne sont pas retrouvées.
+Le POC ne propose pas encore de recherche sémantique, de correction orthographique
+ni de RAG ; les mêmes passages et références pourront servir à une évolution
+hybride. Aucun service externe ni clé d’API n’est nécessaire pour la recherche.
+
+Le code est réparti entre `src/search-index.mjs` (index et requêtes),
+`src/index-search.mjs` (commande d’indexation), `src/search-server.mjs` (serveur
+local) et `web/search/` (interface). Les tests de `test/search.test.mjs` couvrent
+les filtres, le classement par passages, les expressions, les mises à jour,
+la conservation des textes et les restrictions d’accès du serveur.

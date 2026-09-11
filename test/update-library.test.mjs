@@ -33,10 +33,12 @@ test('one command continues after download failures, extracts successes, updates
       assert.match(error.stdout, /INCOMPLETE: Archive missing PDFs/);
       assert.match(error.stdout, /OK: Extract missing Markdown/);
       assert.match(error.stdout, /OK: Refresh metadata and reports/);
+      assert.match(error.stdout, /OK: Update search index/);
       return true;
     });
     assert.match(await fs.readFile(path.join(root, 'pipeline.log'), 'utf8'), /Source URL is missing/);
     assert.equal(requests, 1);
+    assert.ok((await fs.stat(path.join(root, '.search/corpus.sqlite'))).size > 0);
     assert.deepEqual(await fs.readFile(path.join(root, 'articles/downloaded/source.pdf')), pdf);
     const markdownPath = path.join(root, 'articles/downloaded/article.md');
     const markdown = await fs.readFile(markdownPath, 'utf8');
