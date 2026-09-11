@@ -45,6 +45,7 @@ test('one command continues after download failures, extracts successes, updates
     assert.ok(markdown.includes('Parallel Change'));
     const metadata = YAML.parse(await fs.readFile(path.join(root, 'articles/downloaded/metadata.yaml'), 'utf8'));
     assert.ok(metadata.word_count > 0);
+    assert.ok((await fs.stat(path.join(root, 'articles/downloaded/article.epub'))).size > 0);
     for (const filename of ['articles-overview.md', 'articles-overview.csv', 'article-quality.md', 'manual-tasks-todo-for-me.md']) {
       assert.match(await fs.readFile(path.join(root, filename), 'utf8'), /Missing URL/);
     }

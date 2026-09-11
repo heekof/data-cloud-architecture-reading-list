@@ -64,17 +64,25 @@ export function createSearchServer(root) {
           throw error;
         }
       }
-      if (['/api/article', '/source'].includes(url.pathname)) {
+      if (['/api/article', '/source', '/epub'].includes(url.pathname)) {
         const article = (await readConfiguration(root)).find(a => a.id === url.searchParams.get('id'));
         if (!article) return json(404, { error: 'Article introuvable.' });
         const directory = path.dirname(path.join(root, articlePdfPath(article)));
+        if (url.pathname === '/epub') {
+          const content = await fs.readFile(path.join(directory, 'article.epub'));
+          res.setHeader('Content-Type', 'application/epub+zip');
+          res.setHeader('Content-Disposition', 'attachment; filename="article.epub"');
+          res.end(content); return;
+        }
         if (url.pathname === '/source') {
           const filename = path.join(directory, 'source.pdf');
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'inline; filename="source.pdf"');
           res.end(await fs.readFile(filename)); return;
         }
-        return json(200, { ...article, markdown: await fs.readFile(path.join(directory, 'article.md'), 'utf8') });
+        let epub = false;
+        try { epub = (await fs.stat(path.join(directory, 'article.epub'))).isFile(); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+        return json(200, { ...article, epub, markdown: await fs.readFile(path.join(directory, 'article.md'), 'utf8') });
       }
       json(404, { error: 'Page introuvable.' });
     } catch (error) {

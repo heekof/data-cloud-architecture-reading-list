@@ -1,0 +1,376 @@
+{
+  "version": 1,
+  "articles": [
+    {
+      "id": "cloud-native-platforms-build",
+      "status": "ready",
+      "fingerprint": "f28b06fca29f77e776f710a09fb5c5c552541ddbfdd485e888f2aeff692c177d",
+      "output_hash": "88b4875cd45b08f86fd29aa6187f4d9621af5bdb735f9ca0edd1d9c2f86e37eb",
+      "warnings": []
+    },
+    {
+      "id": "road-to-composable-data-systems",
+      "status": "ready",
+      "fingerprint": "b173898fa4804a7fdf3e94719567f052f794d012918b6ba17d448e9cfb1b9500",
+      "output_hash": "766dd5523574c7ff1c8963b38f6a5692bc9940edb926179647073120c0fe0d85",
+      "warnings": []
+    },
+    {
+      "id": "composable-data-management-system-manifesto",
+      "status": "ready",
+      "fingerprint": "175fc46c436aa90a02be7629e7410b0cc406f37076238057fddc3716bbf6440f",
+      "output_hash": "49a3ec3c400450914e499e2f2f07249a7e93a23fca0002ff8f3dd47a8d599a93",
+      "warnings": []
+    },
+    {
+      "id": "begun-the-catalog-wars-have",
+      "status": "ready",
+      "fingerprint": "6272cb27cad4a4a5ae51ad56caf43dfb7345dc1026bd98d90e2b259798ad859a",
+      "output_hash": "8eb402f97f498c99ae98c02d056cc5fb7db738c55b896c44e91ff8792546366c",
+      "warnings": []
+    },
+    {
+      "id": "data-lakehouse-catalog-reality-check",
+      "status": "ready",
+      "fingerprint": "0195c7a1e541a283109bd578d47815965f291ace532f30466c187cb0acc779a6",
+      "output_hash": "51d0b9d2dba332deb8ce3b83da67ffe6015e4170a8960c7afde6596ebf9d3674",
+      "warnings": []
+    },
+    {
+      "id": "make-lakehouse-catalogs-boring-again",
+      "status": "ready",
+      "fingerprint": "0090b0c9de87de6f2fa5ef524648d47a38239273a4a10833a24bd45d7685982e",
+      "output_hash": "9063c677afcee8635c9556e71aba4ef27b3eedcd5ab3c8cf80e71739126f62c7",
+      "warnings": []
+    },
+    {
+      "id": "snowflake-horizon-vs-databricks-unity-catalog",
+      "status": "ready",
+      "fingerprint": "9fb7837212f98bddda0227dd425f26eab3cd0806606b5d0e0c16903cb53e47c8",
+      "output_hash": "418aca4822335667396b76e7f79c4693ca14b5675eb037f782a2bbc369c9e635",
+      "warnings": []
+    },
+    {
+      "id": "databricks-production-planning",
+      "status": "ready",
+      "fingerprint": "77f51527401e350e22ad7b4e7ad3cc5008e70f45a435b0149f01e426c9480f37",
+      "output_hash": "0eff587c7da0aeaaadb019a4499c324ed999db327f8852ff93ab27f9aa6d2327",
+      "warnings": []
+    },
+    {
+      "id": "architecture-best-practices-for-azure-databricks",
+      "status": "ready",
+      "fingerprint": "5955a15bfc505e70756188524f0038e5078731aa4a4dd6fdfeeb9781ef6b2beb",
+      "output_hash": "c5118b79c040a3f537e7e27fa9800c3d0c5df92c3c5f142ef370f1b8f40c3de7",
+      "warnings": []
+    },
+    {
+      "id": "design-unity-catalog-architecture",
+      "status": "ready",
+      "fingerprint": "6661522549154cfb141c304aff227e7870957cff114fd644cc08371f90c9ee7a",
+      "output_hash": "ee66d2a1cf4a420d77c67d2bbe71a98ea4a4868482813d3986e9a77f9c70ed6d",
+      "warnings": []
+    },
+    {
+      "id": "best-practices-for-abac-policies",
+      "status": "ready",
+      "fingerprint": "f03f640b73fc6e205a87aef531be1dbca6db4a1e026d0190d87b3d7c70269fd3",
+      "output_hash": "a9d2328a998b6d0600d5175eb4dda47d4592f80907fb953aca737552730b7332",
+      "warnings": []
+    },
+    {
+      "id": "observability-in-databricks",
+      "status": "ready",
+      "fingerprint": "fd9871d4d36f62904ce242bc41d07e598f30487d5e069eb4570f7c6155245acc",
+      "output_hash": "214dfd0aba0d46142f1434dfd4c7b3d4e1f33cc6ce63eca55590000c1fc3107a",
+      "warnings": []
+    },
+    {
+      "id": "making-retries-safe-with-idempotent-apis",
+      "status": "ready",
+      "fingerprint": "a470112c86d27bb743a60459686c88141e00f5e1369bfd17d2ecce3a2d139a1d",
+      "output_hash": "b967a46b6aba9717e03597c9829eb3017784ee74ed43cb4c7297a484ccdb16ed",
+      "warnings": []
+    },
+    {
+      "id": "deployment-stamps-pattern",
+      "status": "ready",
+      "fingerprint": "c7e53a50be21287c2bedc3f5e9d56db7c13728635bbfde5bed5fb9bd9da6fab4",
+      "output_hash": "d6231cbc603833d3c2883a4ac634445315434749c7d8c7800181372fa60f0038",
+      "warnings": []
+    },
+    {
+      "id": "out-of-the-tar-pit",
+      "status": "ready",
+      "fingerprint": "72be06a067d62b510d510ded4e89472de9b2c3422d3d9ab3d806c3a74481112d",
+      "output_hash": "5009659bb10a1556c368356582e289526d5da7f86f34da3d5e49bf8759d242d3",
+      "warnings": []
+    },
+    {
+      "id": "immutability-changes-everything",
+      "status": "ready",
+      "fingerprint": "82c2a86d4939316555d9407707436d6ff6d2ead6814e4474958f338fff73c25e",
+      "output_hash": "87a97a171c3764e86d8ea37e8b208eb4bdd00e2295416c63e652e1783514bb25",
+      "warnings": []
+    },
+    {
+      "id": "the-log",
+      "status": "ready",
+      "fingerprint": "9811aecfbb9a3ce8d70ab9f64b916fe0705c9e1462ede7ffd59fddc3c9ca254c",
+      "output_hash": "cddf19fd66c6ed102c5ef5c76533ae2af4375ba75d510cbb5e0fbbd319dd5c05",
+      "warnings": []
+    },
+    {
+      "id": "databricks-lakeguard-sigmod-2025",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "unity-catalog-open-universal-governance",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "beyond-indexes-open-table-formats",
+      "status": "ready",
+      "fingerprint": "a13245ddd4e5744a53474d560e1b8038c20839103d4be155680935d1c1148e48",
+      "output_hash": "31bab7594f9d6f4adde4d6208911b7ec06a7fd28b9ae6525b13cfa0ff643f091",
+      "warnings": []
+    },
+    {
+      "id": "parallel-change",
+      "status": "ready",
+      "fingerprint": "b4278045866974224c1e29a34f5170bc51496f3cfa41c7e6eeb1d304c23b0888",
+      "output_hash": "f027e2f8bca0cc82deb6e80530a319168837d6f7e9a5158d14a00a1b473e78d0",
+      "warnings": []
+    },
+    {
+      "id": "making-data-ready-for-agentic-ai",
+      "status": "ready",
+      "fingerprint": "1d4ac676f2296d8c5cad7c308fe333ed36dff4e6c208a69f8f8d84bdc2f13747",
+      "output_hash": "9ce72ff9c2b99b084beaf77cc27961a61a002e4d8a319a0a5cfcfbfbefd9e6aa",
+      "warnings": []
+    },
+    {
+      "id": "governing-ai-agents-unity-catalog",
+      "status": "ready",
+      "fingerprint": "9f30161e0615ffe91f85a07a64ba9eb6e4fa47881652268e996b923904494e85",
+      "output_hash": "99e3fbac12ad0bb7768c407498c1ffd0a23efa678e6db8b50d8333cce4f026a4",
+      "warnings": []
+    },
+    {
+      "id": "cloud-native-platforms-run",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "cloud-native-platforms-evolve",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "lakeflow-agentic-data-engineering",
+      "status": "ready",
+      "fingerprint": "8b3a336ca5f20aab017d593039adafc91761a5859ba3c1039c342bd4102afc9c",
+      "output_hash": "b509391fe79833f5bc13b202417d0934a69f9cd7a5c5f4a4ffb1fc5870ee97fd",
+      "warnings": []
+    },
+    {
+      "id": "ai-governance-data-governance-gone-wild",
+      "status": "ready",
+      "fingerprint": "b5ba94519b05edfc447745fe8debd74197ebd308fcb1e25b9d9b9161751514d1",
+      "output_hash": "427b7bfc38df1e0a7ab140ef631557df2999b33352952c9857b0cc2984a6ee8c",
+      "warnings": []
+    },
+    {
+      "id": "camel-prompt-injection-mitigation",
+      "status": "ready",
+      "fingerprint": "81760cf98a455e510b0eb7d1c138b1736d6a4d44eb4e55800b4bb6c29f4f5e64",
+      "output_hash": "b67d62a088b3c911314299232c61ce0f7219f95f4876b17bd10f898083f33faa",
+      "warnings": []
+    },
+    {
+      "id": "design-patterns-securing-llm-agents",
+      "status": "ready",
+      "fingerprint": "15913db8ce20cb454a345e3b052dc7e0ddf7bbbaa689e9c3129825e348efaf53",
+      "output_hash": "088a4531093d2ee0cf1f7c8389cc376171a08a99785aff7ca3652be7eb3116d3",
+      "warnings": []
+    },
+    {
+      "id": "lethal-trifecta-ai-agents",
+      "status": "ready",
+      "fingerprint": "36a2d76a2c7067b0347c1fedf6704d44fae019c3e365b2d7ec8fd71d074115b7",
+      "output_hash": "ff37a42f4df2a03b0b42fc21f402a7f0020755db327fc1d7d488d0310cf39b08",
+      "warnings": []
+    },
+    {
+      "id": "big-data-is-dead",
+      "status": "ready",
+      "fingerprint": "8b9d7138bf971806d0c69154288b2db6eef587f7bbc89e9c48ce69dd13d1587c",
+      "output_hash": "5c477ececb78fa216002c74d87412b46886f337639c970de3537c1f36536bb78",
+      "warnings": []
+    },
+    {
+      "id": "designing-data-intensive-applications",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "mapreduce-simplified-data-processing",
+      "status": "ready",
+      "fingerprint": "029fc6171f8d5525f3afc98aac58358bafd06672d1fdad2862934fc05064bf50",
+      "output_hash": "f70a2e90e88cd77c3c614fec0899775ca59e74366eeb251fc10e20bbcdbbcd02",
+      "warnings": []
+    },
+    {
+      "id": "apache-iceberg-definitive-guide",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "data-mesh",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "site-reliability-engineering",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "the-architect-elevator",
+      "status": "missing_markdown",
+      "warnings": [
+        "Texte Markdown absent ou vide ; EPUB non généré."
+      ]
+    },
+    {
+      "id": "delta-lake-acid-table-storage",
+      "status": "ready",
+      "fingerprint": "79be36a2382a4dba526239bcf8a6fee5993fd943c4908d0b199feb6c6a6a126c",
+      "output_hash": "98ae0bef066f04bc8e41097e4e7c83242fcd932c943aa76aa55f327627bb5bef",
+      "warnings": []
+    },
+    {
+      "id": "evolutionary-database-design",
+      "status": "ready",
+      "fingerprint": "b37d6554265b77a176c66ab253cedd4cf23aac13db4bb79752fa0b9b933eacac",
+      "output_hash": "c1526f4112023e187da8525c8c9375227d1785334c8de62ee4c5a32bf46aad81",
+      "warnings": []
+    },
+    {
+      "id": "what-i-talk-about-when-i-talk-about-platforms",
+      "status": "ready",
+      "fingerprint": "7be0a61b62f6d0e7d73933cb8846b9c18d35d75d29c104bfa26812a358de27d5",
+      "output_hash": "bddfc609d7c3b812f3478bbca95c940452426e2392e5433cbd784af36ea8e481",
+      "warnings": []
+    },
+    {
+      "id": "designing-data-products",
+      "status": "ready",
+      "fingerprint": "3ff6dca66f92115cd4d4934f73d4ab9ceaba721bfcdd9a0b4c81d2f3a1857349",
+      "output_hash": "36a50f333103f367017ae9fdfacae2532bd8aaea45d06f93cc973488c61b40b0",
+      "warnings": []
+    },
+    {
+      "id": "your-ai-product-needs-evals",
+      "status": "ready",
+      "fingerprint": "d22c0b7c27935e0f32cc9f6a35ddd377928f269603fb763c028e16c3d2a2cd4c",
+      "output_hash": "5aa9d080bc320a96d2c595e33637036477fa4cdef713db1d845d4c3dc41a1f8d",
+      "warnings": []
+    },
+    {
+      "id": "life-beyond-distributed-transactions",
+      "status": "ready",
+      "fingerprint": "9308a625c0b027fa926d59dc1a885a81d224fabf728b15e53035f75f98e3a631",
+      "output_hash": "ffbaafe0ca98c3d31db1a8123f96019fce2de2bf817c0420c900ae4270992742",
+      "warnings": []
+    },
+    {
+      "id": "what-do-you-mean-by-event-driven",
+      "status": "ready",
+      "fingerprint": "2ee01e821f8557c09adfcddae2ae53c04e82255768166cb49c86e6a37d5f3358",
+      "output_hash": "7422e35bcc764ff23d2d8c4a96a8a2d3a6f9dcbb8ad41ef7f14f736ed69a79cd",
+      "warnings": []
+    },
+    {
+      "id": "building-effective-agents",
+      "status": "ready",
+      "fingerprint": "ba7f26410d3c19178992b8c8f66f6cd7f45d03ecce9957b9c7d4c52e3fb37690",
+      "output_hash": "36190debaf5a2c52da768e9eefdd134a9444699e5e8bb5b140fc1e102c072d5a",
+      "warnings": []
+    },
+    {
+      "id": "laws-of-frugal-architecture",
+      "status": "ready",
+      "fingerprint": "4af00aa90e26e2c8549937803bac091d958db4141cf8f99639b31c99f453d49c",
+      "output_hash": "6c858f1f679e541f1223ff218879a2b5574db1de96def2b1532340a66182a55a",
+      "warnings": []
+    },
+    {
+      "id": "governing-data-products-using-fitness-functions",
+      "status": "ready",
+      "fingerprint": "a5cc20624904385c643b1e47bbd1e116349993104c92ce0e1b5ba7ee4c5eea90",
+      "output_hash": "9d0b3f7e4bc40d562dc96bcb292719566a723ae09447e52fb238720efb15f4e7",
+      "warnings": []
+    },
+    {
+      "id": "static-stability-using-availability-zones",
+      "status": "ready",
+      "fingerprint": "bd0716c5053e044d293e87428e8da1654f6570b53fc31e6081a820ab5664d732",
+      "output_hash": "3d379d11d79c20d10557942932c46159fe21f522d8c376f425b80472515beb21",
+      "warnings": []
+    },
+    {
+      "id": "the-quest-for-semantic-architecture",
+      "status": "ready",
+      "fingerprint": "28f75a7162da47b782277226102c500840ed9fe12c7fd5ee7b9b7f95d173f65c",
+      "output_hash": "32b4fb8e78c4bad3f25debca900ec8bea14395ee522fcd1e7f6bf32376c077b4",
+      "warnings": []
+    },
+    {
+      "id": "naive-reuse-considered-harmful",
+      "status": "ready",
+      "fingerprint": "b9a348bc0bb2ba32439b5e34a3c1e86227b3d324bd7351ab6300028784e95f86",
+      "output_hash": "2e9b4f9307166e5326c7095b4689a99a9d692af11d61c60099e2d8e55451f83c",
+      "warnings": []
+    },
+    {
+      "id": "dont-get-locked-up-into-avoiding-lock-in",
+      "status": "ready",
+      "fingerprint": "c3488f3f131704ee935b51fd0d226acb077312fb6200d4305ab20d5191dea03e",
+      "output_hash": "4b204c40af35b88ae9bb744827377e98af8b71c9b4fe73357d965f9ae5dd502e",
+      "warnings": []
+    },
+    {
+      "id": "the-problem-was-the-product",
+      "status": "ready",
+      "fingerprint": "45cc0246beb790f36cf4bba70126d6784f8d43af7507653775481504cee83e63",
+      "output_hash": "5d4cf4ad8520dfa6dc1aaa64791388ca57e1bbfed81e659b3d69dded8084bc9a",
+      "warnings": []
+    },
+    {
+      "id": "ironies-of-automation",
+      "status": "ready",
+      "fingerprint": "4318c1ae9bb63aadffd57359d8b1794192af16f4b2e9fc3848ef472286a1172f",
+      "output_hash": "12ce1fe4f606545f3e068552c108637a2b5638ead9474e477e47b89c8671e7b8",
+      "warnings": []
+    }
+  ]
+}

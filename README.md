@@ -805,3 +805,53 @@ sujets réels : les tests logiciels ne mesurent pas la qualité des choix du LLM
 
 Après un import contenant de nouvelles propositions, la vue passe automatiquement
 à **À examiner** pour les rendre visibles, même si un autre filtre était actif.
+
+### EPUB pour Kindle et liseuses
+
+`npm run archive` enchaîne maintenant **PDF → Markdown → EPUB**. La conversion
+EPUB fait partie de l’étape d’extraction ; `npm run extract` la lance également,
+y compris lorsque le Markdown existe déjà. Chaque article avec un texte non vide
+reçoit un fichier `articles/<id>/article.epub`. Les articles sans Markdown sont
+signalés, sans créer d’EPUB vide. Les sources PDF et le Markdown restent intacts.
+
+Pour générer ou actualiser uniquement les EPUB, sans récupérer de sources :
+
+```sh
+npm run epub
+npm run epub -- --id=parallel-change
+```
+
+Les EPUB inchangés sont conservés. Si le Markdown, les métadonnées de publication
+ou une image embarquée changent, l’EPUB généré par l’outil est actualisé. Le rapport
+`epub-report.json` conserve les empreintes nécessaires et indique les textes
+manquants, les erreurs et les avertissements. Conservez ce rapport avec les EPUB
+si vous les versionnez. Un EPUB inconnu du rapport ou modifié manuellement est
+préservé et signalé : déplacez-le avant de demander une nouvelle génération.
+Évitez deux générations simultanées ou une édition manuelle pendant la conversion.
+
+Le rendu EPUB 3 conserve les titres, paragraphes, listes, tableaux, blocs de code
+et liens web présents dans le Markdown. Il comporte un sommaire et un lien vers
+la source. La langue vient du champ facultatif `language` de l’index global et
+vaut `en` par défaut pour ce corpus principalement anglais. L’auteur n’est inclus
+que si un champ `author` textuel est renseigné.
+
+Les images PNG, JPEG et GIF référencées dans le dossier de l’article sont embarquées.
+Les images distantes, absentes, hors du dossier ou non prises en charge sont
+remplacées par leur description et signalées. Aucun téléchargement d’image n’est
+réalisé. Le HTML brut est affiché comme texte et les liens locaux non embarqués
+conservent leur libellé. La conversion ne reconstitue pas les illustrations ou la
+structure perdue lors de l’extraction PDF ; la qualité dépend du Markdown.
+
+Dans le lecteur de l’interface, **Télécharger l’EPUB** apparaît lorsque le fichier
+est disponible. Après mise à jour du code, redémarrez le serveur de recherche.
+Envoyez ensuite le fichier via [Send to Kindle](https://www.amazon.com/sendtokindle),
+qui accepte l’EPUB et le convertit pour Kindle. L’envoi à Amazon reste manuel.
+Les sources signalées comme rejetées peuvent aussi avoir un EPUB ; sa présence
+ne constitue pas une validation du texte.
+
+Implémentation : `src/epub.mjs` et `src/generate-epubs.mjs`, avec `markdown-it`
+pour le rendu XHTML et `fflate` pour l’archive EPUB. Aucune installation de Pandoc
+n’est nécessaire. Les tests contrôlent l’archive, le sommaire, les images, la
+préservation des fichiers et le parcours d’archivage. Les 44 premiers fichiers
+ont également passé un contrôle XML/XHTML ; leur rendu exact sur un Kindle réel
+reste à vérifier lors du premier envoi.

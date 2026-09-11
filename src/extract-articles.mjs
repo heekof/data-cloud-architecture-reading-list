@@ -1,3 +1,4 @@
+import { generateEpubs } from './epub.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
@@ -49,6 +50,8 @@ try {
     }
   }
   await syncMetadata(root, articles);
+  const epub = await generateEpubs(root, { ids });
+  if (epub.failed) process.exitCode = 1;
   console.log(`Created: ${created}; existing Markdown preserved: ${existing}; missing PDF: ${missing}; failed: ${failed}.`);
   if (failed) process.exitCode = 1;
 } catch (error) {
