@@ -67,6 +67,27 @@ is not counted. It is `null` when Markdown is absent, and `0` for an empty file.
 The count is recalculated by extraction and metadata synchronization, not stored
 in `articles.yaml`.
 
+### Article overview
+
+Run `npm run articles:report` to refresh metadata and generate:
+
+- [Articles overview](articles-overview.md): a readable table with one row per ID,
+  title, category, word count, rating, estimated reading time, suggested keywords,
+  quality status, issues, and links to the available PDF and Markdown.
+- [CSV export](articles-overview.csv): the same inventory with separate file paths,
+  the original URL, and the keyword source for sorting/filtering in other tools.
+
+Rows are ordered by ascending word count, with missing counts last. Missing values
+stay blank/dashed; a real zero is preserved. Reading time assumes 200 words per
+minute and rounds up. Up to six keywords are ranked locally by term frequency and
+rarity across this corpus, with extra weight for title/category terms and common
+English/French words filtered out. These are automatic lexical suggestions, not
+reviewed tags. Without Markdown, suggestions use title, category, and available
+notes only. No article content is generated or changed. Outputs are current
+snapshots, replaced only when their content changes; they are not historical logs.
+Rerun the command after changing articles or reviews. No extra dependency or
+network access is required.
+
 ### Quality flags
 
 [Article quality](article-quality.md) lists every article's state, word count, and
@@ -118,6 +139,70 @@ The existing `articles/<category>.md` files remain personal reviews. The 28 PDFs
 previously stored at `pdfs/<category>/<id>.pdf` now live at
 `articles/<id>/source.pdf`, unchanged. The existing source copyright notice is
 preserved in [articles/README.md](articles/README.md).
+
+### End-to-end maintenance procedure
+
+1. **Prepare the tools.** From the repository root, run `npm ci` to install the
+   locked Node dependencies. PDF extraction additionally requires Poppler; on
+   macOS install it with `brew install poppler`, then check `pdftotext -v`.
+   Generating the inventory alone does not require Poppler or a browser.
+2. **Maintain the index.** Add or update entries in `articles.yaml`. Keep IDs
+   globally unique and stable. Preserve unknown ratings and URLs as `null`.
+   Run `npm run metadata:sync` to create/update article folders and metadata.
+3. **Supply sources and extract text.** Save an available original PDF as
+   `articles/<id>/source.pdf`, or run `npm run archive` to download missing
+   sources (this step uses the network and may need the browser setup below).
+   Preserve original files. Then run `npm run extract`; for a selected source,
+   use `npm run extract -- --id=<article-id>`. Existing Markdown is skipped,
+   so preserve it under another name before intentionally re-extracting a source.
+   Refer to the extraction section above for column-order options and limitations.
+4. **Review quality.** Compare the Markdown with its PDF, checking the beginning,
+   end, page coverage, reading order, and any code, tables, or formulas. In the
+   local `metadata.yaml`, change only `quality_review` to record your decision.
+   Flag incomplete or incorrect sources as `rejected` and explain why; leave
+   unverified content `pending`. Approval is a review decision, not an automatic
+   consequence of successful extraction. Reset the review after content changes.
+5. **Generate the inventory.** Run `npm run articles:report`. This refreshes word
+   counts and quality metadata, preserves review decisions, updates
+   `article-quality.md`, and writes `articles-overview.md` and
+   `articles-overview.csv`. Check that each indexed ID appears once and that
+   missing text has a missing word count rather than zero. Use the CSV to sort
+   or filter by rating, length, category, keyword, or quality state.
+6. **Validate and version the result.** Run the checks below, inspect the changed
+   files, then commit the scripts, documentation, metadata, and generated reports
+   together. Push to the intended branch after the commit succeeds. Re-running
+   generation with unchanged inputs should produce no further file changes.
+
+```sh
+npm run articles:report
+npm test
+git diff --check
+git diff --stat
+git status --short
+```
+
+Example of a persistent quality flag in an article's `metadata.yaml`:
+
+```yaml
+quality_review:
+  status: rejected
+  notes: "The source PDF ends mid-sentence; obtain a complete capture."
+```
+
+For a report-only refresh after editing ratings or review notes, just run
+`npm run articles:report`; extraction and downloading are unnecessary. Reports
+are refreshed on demand by this command, not by a background scheduler. Do not
+edit generated table cells: change the index, extraction, or review that supplies
+them, then regenerate. The CSV includes `keyword_source` so metadata-only
+suggestions can be distinguished from suggestions based on extracted text.
+
+Implementation: `src/generate-article-report.mjs` coordinates synchronization
+and generation; `src/article-report.mjs` builds rows, ranks lexical keywords,
+and renders Markdown/CSV. `test/article-report.test.mjs` checks row coverage,
+missing versus zero values, sorting, word counts, escaping, stable regeneration,
+and preservation of sources and review decisions. The broader suite covers
+archiving, extraction, metadata synchronization, and quality flags. Poppler must
+be installed to run the PDF extraction integration test rather than skip it.
 
 ## From Reading to Architectural Practice
 

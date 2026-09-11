@@ -8,7 +8,8 @@
     "archive": "node src/archive-articles.mjs",
     "archive:tasks": "node src/archive-articles.mjs --refresh-manual-tasks",
     "metadata:sync": "node src/sync-metadata.mjs",
-    "extract": "node src/extract-articles.mjs"
+    "extract": "node src/extract-articles.mjs",
+    "articles:report": "node src/generate-article-report.mjs"
   },
   "repository": {
     "type": "git",
