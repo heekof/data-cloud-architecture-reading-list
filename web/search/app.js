@@ -48,7 +48,8 @@ async function openReader(article) {
   document.querySelector('.reader-scroll').scrollTop = 0;
   try {
     const data = await get(`/api/article?id=${encodeURIComponent(article.id)}`, signal);
-    if (data.epub) $('reader-links').append(link('Télécharger l’EPUB ↓', `/epub?id=${encodeURIComponent(article.id)}`));
+    if (data.epub) $('reader-links').append(link('EPUB vérifié ↓', `/epub?id=${encodeURIComponent(article.id)}`));
+    else if (data.epub_edition?.preview) $('reader-links').append(link('Aperçu EPUB non vérifié ↓', `/epub?id=${encodeURIComponent(article.id)}&preview=1`));
     const fragment = document.createDocumentFragment();
     data.markdown.replace(/\r\n?/g, '\n').split('\n').forEach((line, index) => {
       const heading = line.match(/^#{1,6}\s+(.+)/);
@@ -126,6 +127,7 @@ $('next').addEventListener('click', () => { page++; search({ keepPage: true }); 
 async function init() {
   initWorkbench();
   initDiscovery();
+  initGym();
   try {
     const stats = await get('/api/stats');
     $('stat-articles').textContent = number(stats.articles); $('stat-words').textContent = number(stats.words);

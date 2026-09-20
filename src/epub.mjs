@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { inspectContent, optionalFile } from './content-quality.mjs';
 import MarkdownIt from 'markdown-it';
 import { zipSync, strToU8 } from 'fflate';
 import { readConfiguration, articlePdfPath, countWords } from './article-library.mjs';
@@ -13,8 +14,8 @@ const stylesheet = 'body{font-family:serif;line-height:1.5;margin:5%;}h1,h2,h3{l
 const xhtml = (title, language, body) => `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${xml(language)}" xml:lang="${xml(language)}"><head><title>${xml(title)}</title><link rel="stylesheet" type="text/css" href="style.css" /></head><body>${body}</body></html>`;
 async function readOptional(filename) { try { return await fs.readFile(filename); } catch (error) { if (error.code === 'ENOENT') return null; throw error; } }
 
-export async function buildEpub(article, markdown, directory) {
-  const warnings = [];
+export async function buildEpub(article, markdown, directory, { trust = null } = {}) {
+  const warnings = trust && trust.quality !== 'ok' ? ['Unverified preview — review the source and extraction before relying on this edition.', ...(trust.issues || []), ...(trust.notes ? [`Review note: ${trust.notes}`] : [])] : [];
   const language = typeof article.language === 'string' && /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(article.language) ? article.language : 'en';
   const md = new MarkdownIt({ html: false, xhtmlOut: true, linkify: false, typographer: false });
   const tokens = md.parse(clean(markdown), {});
@@ -62,7 +63,7 @@ export async function buildEpub(article, markdown, directory) {
   const identifier = `urn:sha256:${hash(article.id)}`;
   const modified = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
   const resources = [...images.values()].filter(Boolean);
-  const fingerprint = hash(JSON.stringify({ version: 1, id: article.id, title, url: article.url, language, author: article.author || null, markdown, resources: resources.map(r => [r.name, hash(r.data)]) }));
+  const fingerprint = hash(JSON.stringify({ version: 2, trust, id: article.id, title, url: article.url, language, author: article.author || null, markdown, resources: resources.map(r => [r.name, hash(r.data)]) }));
   const source = article.url ? `<p class="source">Source : <a href="${xml(article.url)}">${xml(article.url)}</a></p>` : '';
   const nav = `<nav epub:type="toc" id="toc"><h1>Sommaire</h1><ol><li><a href="article.xhtml">${xml(title)}</a>${headings.length ? `<ol>${headings.map(h => `<li><a href="article.xhtml#${h.id}">${xml(h.title)}</a></li>`).join('')}</ol>` : ''}</li></ol></nav>`;
   const opf = `<?xml version="1.0" encoding="UTF-8"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="book-id">${identifier}</dc:identifier><dc:title>${xml(title)}</dc:title><dc:language>${xml(language)}</dc:language>${typeof article.author === 'string' ? `<dc:creator>${xml(article.author)}</dc:creator>` : ''}${article.url ? `<dc:source>${xml(article.url)}</dc:source>` : ''}<meta property="dcterms:modified">${modified}</meta></metadata><manifest><item id="article" href="article.xhtml" media-type="application/xhtml+xml"/><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="css" href="style.css" media-type="text/css"/>${resources.map((r, i) => `<item id="image-${i}" href="${xml(r.name)}" media-type="${r.type}"/>`).join('')}</manifest><spine><itemref idref="article"/></spine></package>`;
@@ -71,7 +72,7 @@ export async function buildEpub(article, markdown, directory) {
     'META-INF/container.xml': strToU8('<?xml version="1.0"?><container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0"><rootfiles><rootfile full-path="EPUB/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'),
     'EPUB/content.opf': strToU8(opf),
     'EPUB/nav.xhtml': strToU8(xhtml('Sommaire', language, nav)),
-    'EPUB/article.xhtml': strToU8(xhtml(title, language, `<header><h1>${xml(title)}</h1>${source}</header>${body}`)),
+    'EPUB/article.xhtml': strToU8(xhtml(title, language, `<header><h1>${xml(title)}</h1>${source}</header>${warnings.length ? `<aside class="notice"><h2>Reading notice</h2>${warnings.map(w => `<p>${xml(w)}</p>`).join('')}</aside>` : ''}${body}`)),
     'EPUB/style.css': strToU8(stylesheet),
   };
   for (const resource of resources) files[`EPUB/${resource.name}`] = resource.data;
@@ -102,7 +103,9 @@ export async function generateEpubs(root, { ids = [], log = console.log } = {}) 
         totals.missing++; rows.set(article.id, { ...old, id: article.id, status: 'missing_markdown', warnings: ['Texte Markdown absent ou vide ; EPUB non généré.'] });
         log(`EPUB skipped (missing text): ${article.id}`); await writeReport(); continue;
       }
-      const built = await buildEpub(article, input.toString('utf8'), directory);
+      const current = await inspectContent(directory);
+      if (current.review.status === 'rejected') throw new Error('Rejected source: existing EPUB preserved; downloads blocked.');
+      const built = await buildEpub(article, input.toString('utf8'), directory, { trust: editionTrust(current) });
       const existing = await readOptional(destination);
       if (existing && hash(existing) !== old.output_hash) throw new Error('Existing EPUB is unmanaged or manually modified; preserved. Move it aside before regenerating.');
       if (existing && built.fingerprint === old.fingerprint) {
@@ -128,4 +131,29 @@ export async function generateEpubs(root, { ids = [], log = console.log } = {}) 
   }
   log(`EPUBs: ${totals.created} created, ${totals.updated} updated, ${totals.unchanged} unchanged, ${totals.missing} without Markdown, ${totals.failed} failed. Report: epub-report.json`);
   return totals;
+}
+
+export function editionTrust(current) {
+  return { quality: current.quality.status, review: current.review.status, issues: current.quality.issues,
+    notes: current.review.notes || null, source_hash: current.source_hash, markdown_hash: current.markdown_hash };
+}
+export async function epubEdition(root, article, { preview = false, download = false } = {}) {
+  const directory = path.dirname(path.join(root, articlePdfPath(article)));
+  const current = await inspectContent(directory);
+  if (current.review.status === 'rejected' || !current.wordCount) {
+    if (download) throw Object.assign(new Error('Source rejected or text missing; the previous EPUB is preserved but unavailable for download.'), { status: 409 });
+    return { status: 'unavailable', verified: false, preview: false };
+  }
+  const built = await buildEpub(article, current.markdown, directory, { trust: editionTrust(current) });
+  const reportBytes = await optionalFile(path.join(root, 'epub-report.json'));
+  const row = reportBytes ? JSON.parse(reportBytes).articles?.find(a => a.id === article.id) : null;
+  const bytes = await optionalFile(path.join(directory, 'article.epub'));
+  const fresh = !!bytes && row?.status === 'ready' && row?.fingerprint === built.fingerprint && row?.output_hash === hash(bytes);
+  const verified = fresh && current.quality.status === 'ok';
+  const status = verified ? 'verified' : fresh ? 'unverified' : 'stale';
+  if (!download) return { status, verified, preview: true };
+  if (verified && !preview) return { bytes, status };
+  if (!preview) throw Object.assign(new Error('No current verified edition. Use the explicitly labelled preview or review and regenerate the EPUB.'), { status: 409 });
+  const rendered = await buildEpub(article, current.markdown, directory, { trust: { ...editionTrust(current), quality: 'preview', issues: [...current.quality.issues, `Saved edition: ${status}. Preview generated from current Markdown.`] } });
+  return { bytes: rendered.bytes, status: 'preview' };
 }

@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "id": "23f2a767-2491-4163-8a5f-9b9944e001fc",
+  "revision": 2,
+  "stage": "example_not_personal_progress",
+  "title": "Ownership that survives a departure",
+  "scenario": "An engineer leaves and platform objects remain individually owned. Design an ownership model that preserves accountability without making the platform team approve every creation. State your assumptions, compare alternatives, describe failure modes and operational responsibilities.",
+  "initial_answer": "Illustrative answer authored by Codex, not the user: assign every object to the platform team so an engineer leaving cannot orphan it. Require approval for each creation.",
+  "evidence": [
+    {
+      "reference": "S1",
+      "id": "design-unity-catalog-architecture",
+      "start": 338,
+      "end": 348,
+      "title": "Design Unity Catalog Architecture",
+      "url": "https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog",
+      "text": "In a centralized model, assign a single metastore admin or designated group.\nIn a decentralized model, manage permissions through automated deployment\npipelines rather than delegating to individual administrators.\nIf you use a metastore admin, it is strongly recommended to assign the role to a designated\ngroup instead of a single user.\n\nIsolation mechanisms\nTo support enterprise-grade segregation for security or organizational reasons, Unity Catalog\nsupports isolation on several levels:\nAdmin isolation (delegation of management): Data should be managed by designated\npeople or teams, based on the purpose or ownership of that data.",
+      "source_hash": "896fa32742a9481e80e07f424e1655b69a7211b6a00482a34a4febc7ffc6b9f8",
+      "markdown_hash": "adf145ef1b39f80a0c52fbc487281cad6cbb6f6053b0bd94d64d90180b68b9c4",
+      "quality": "not_reviewed"
+    },
+    {
+      "reference": "S2",
+      "id": "governing-data-products-using-fitness-functions",
+      "start": 54,
+      "end": 71,
+      "title": "Governing Data Products Using Fitness Functions",
+      "url": "https://martinfowler.com/articles/fitness-functions-data-products.html",
+      "text": "The key idea behind data mesh is to improve data management in large organizations\nby decentralizing ownership of analytical data. Instead of a central team managing all\nanalytical data, smaller autonomous domain-aligned teams own their respective data\nproducts. This setup allows for these teams to be responsive to evolving business\nneeds and effectively apply their domain knowledge towards data driven decision\nmaking.\nHaving smaller autonomous teams presents different sets of governance challenges\ncompared to having a central team managing all of analytical data in a central data\nplatform. Traditional ways of enforcing governance rules using data stewards work\nagainst the idea of autonomous teams and do not scale in a distributed setup. Hence\nwith the data mesh approach, the emphasis is to use automation to enforce\ngovernance rules. In this article we'll examine how to use the concept of fitness\nfunctions to enforce governance rules on data products in a data mesh. 1\nThis is particularly important to ensure that the data products meet a minimum\ngovernance standard which in turn is crucial for their interoperability and the network\neffects that data mesh promises.\n\nData product as an architectural quantum of the",
+      "source_hash": "ce0905d5b4d8b1ae2b825cf86e5750c5c9d89da3538fe71bcf255c5aeb04d8a7",
+      "markdown_hash": "91c476686454971ab89f3d6cfc8c5a7f1676b06e850fe92eeb4e7e400b9f3760",
+      "quality": "not_reviewed"
+    },
+    {
+      "reference": "S3",
+      "id": "design-unity-catalog-architecture",
+      "start": 568,
+      "end": 585,
+      "title": "Design Unity Catalog Architecture",
+      "url": "https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog",
+      "text": "Data curators: Manage all data assets (for example, ownership, create, modify, delete\nprivileges).\nData consumers: Read-only access to most data assets (select privileges).\nData engineers: Read-write access to development and staging environments.\nAnalysts: Read-only access to production analytics data.\nPermission delegation\nThe metastore administrator establishes and enforces permission policies by assigning and\ndelegating access rights to users or groups based on their responsibilities. For example:\nData curators may be granted ownership or write privileges for managing datasets.\nConsumers receive read-level permissions through group membership.\nThis structure ensures consistent governance, simplifies maintenance, and supports\ncompliance with organizational data policies.\nBest practices for permission models\nGrant privileges to groups rather than individual users for easier management.\nUse least-privilege access (grant only the minimum permissions required).\nDocument access control policies and review regularly with security teams.\n\nhttps://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog",
+      "source_hash": "896fa32742a9481e80e07f424e1655b69a7211b6a00482a34a4febc7ffc6b9f8",
+      "markdown_hash": "adf145ef1b39f80a0c52fbc487281cad6cbb6f6053b0bd94d64d90180b68b9c4",
+      "quality": "not_reviewed"
+    }
+  ],
+  "critique": [
+    {
+      "dimension": "Assumptions",
+      "question": "Does your proposal distinguish durable group ownership from named business accountability? Who maintains group membership?",
+      "evidence": "S1"
+    },
+    {
+      "dimension": "Alternatives",
+      "question": "Compare domain delegation with individual ownership and central platform ownership. Which trade-offs justify your choice?",
+      "evidence": "S2"
+    },
+    {
+      "dimension": "Failure modes",
+      "question": "Test an empty owner group, a departed engineer, failed provisioning and an over-privileged service identity. What detects each failure and who repairs it?",
+      "evidence": "S3"
+    },
+    {
+      "dimension": "Operations",
+      "question": "Specify creation defaults, reconciliation, exception expiry, audit evidence and an escalation path. Which checks could become automated fitness functions?",
+      "evidence": "S2"
+    }
+  ],
+  "updated_at": "2026-09-20T10:01:52.038Z",
+  "critique_notes": "The initial proposal removes dependency on one engineer but creates an approval queue and makes operational ownership ambiguous. S1 supports groups for metastore administration and automated delegation; it does not establish that every object should share one owner. S2 motivates domain accountability and automated governance instead of central stewards approving every action. S3 supports group-based grants and distinct curator/consumer responsibilities. The controls below are proposed design choices inferred from those readings, not verbatim source requirements. Assumptions: identity lifecycle automation exists, each domain has an accountable manager and backup, and relevant object APIs support ownership reassignment. Validate these assumptions and supported object types before rollout.",
+  "revised_decision": "Give each domain a durable, narrowly scoped owner group, with a named accountable manager and deputy recorded separately. Use domain-scoped deployment identities and provisioning templates to assign objects to the correct group at creation; keep grant administration distinct from ordinary consumption. The platform team owns policy templates, reconciliation and audited emergency recovery, while domains own membership and day-to-day decisions. Detect personal ownership, empty groups and stale accountable contacts daily; alert the domain first and escalate unresolved findings to the platform team. During migration, inventory all object types, test transfer behavior on a small domain, and compare access before and after each transfer. Use idempotent reassignment with an audit log; do not revoke the former owner until the new group and recovery path have been verified. Temporary exceptions need an owner, expiry and recorded reason. Alternatives: personal ownership is simple but fragile on departure; universal platform ownership is easy to enumerate but centralizes decisions and privileges; domain groups add lifecycle work but preserve autonomy. Failure drills cover an empty group, provisioning failure, an excessively privileged identity and delayed identity deprovisioning.",
+  "reconsider_when": "Proposed pilot gates, not established benchmark targets: reconsider after any transfer causes unexpected access loss, critical objects remain orphaned beyond one business day, or a domain cannot maintain a manager/deputy and recovery contact. Review incident history, queue latency and exception volume after 30 days. Revisit the grouping model if domain boundaries change, the identity system cannot maintain group lifecycle, or object-level ownership APIs cannot support safe reconciliation.",
+  "kind": "illustrative_example",
+  "author": "Codex"
+}

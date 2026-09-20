@@ -228,7 +228,6 @@ async function archiveArticle(browser, article) {
   });
 
   const context = await browser.newContext({
-    ignoreHTTPSErrors: true,
     viewport: {
       width: 1440,
       height: 1000,

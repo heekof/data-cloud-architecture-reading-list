@@ -1,4 +1,6 @@
 import { discoveryPrompt, discoveryInbox, createDiscoveryWriter } from './discovery.mjs';
+import { epubEdition } from './epub.mjs';
+import { gymOverview, gymSession, saveGym, gymPack, decisionMarkdown } from './architect-gym.mjs';
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -7,7 +9,7 @@ import { readConfiguration, articlePdfPath } from './article-library.mjs';
 import { reviewQueue, createReviewWriter, exportContext } from './library-workbench.mjs';
 import { indexCorpus, searchCorpus, corpusStats } from './search-index.mjs';
 
-const assets = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']], ['/workbench.js', ['workbench.js', 'text/javascript']], ['/discovery.js', ['discovery.js', 'text/javascript']]]);
+const assets = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']], ['/workbench.js', ['workbench.js', 'text/javascript']], ['/discovery.js', ['discovery.js', 'text/javascript']], ['/gym.js', ['gym.js', 'text/javascript']]]);
 const webRoot = fileURLToPath(new URL('../web/search/', import.meta.url));
 export function createSearchServer(root) {
   const saveReview = createReviewWriter(root);
@@ -28,7 +30,7 @@ export function createSearchServer(root) {
     try {
       const url = new URL(req.url, 'http://127.0.0.1');
       if (req.method === 'POST') {
-        if (!['/api/review', '/api/context', '/api/discovery/prompt', '/api/discovery/import', '/api/discovery/decision', '/api/discovery/accept'].includes(url.pathname)) return json(405, { error: 'Méthode non autorisée.' });
+        if (!['/api/gym', '/api/review', '/api/context', '/api/discovery/prompt', '/api/discovery/import', '/api/discovery/decision', '/api/discovery/accept'].includes(url.pathname)) return json(405, { error: 'Méthode non autorisée.' });
         if (req.headers.origin !== `http://${req.headers.host}` || req.headers['x-library-action'] !== '1' || !req.headers['content-type']?.startsWith('application/json')) return json(403, { error: 'Cette action doit provenir de l’interface locale.' });
         const payload = []; let bytes = 0;
         for await (const chunk of req) {
@@ -39,9 +41,23 @@ export function createSearchServer(root) {
         let body;
         try { body = JSON.parse(Buffer.concat(payload).toString('utf8')); }
         catch { return json(400, { error: 'Requête JSON invalide.' }); }
+        if (url.pathname === '/api/gym') return json(200, await serializeMutation(() => saveGym(root, body)));
         if (url.pathname === '/api/discovery/prompt') return json(200, await discoveryPrompt(root, body));
         if (url.pathname.startsWith('/api/discovery/')) return json(200, await serializeMutation(() => writeDiscovery(url.pathname.split('/').at(-1), body)));
         return json(200, url.pathname === '/api/review' ? await serializeMutation(() => saveReview(body)) : await exportContext(root, body));
+      }
+      if (url.pathname === '/api/gym') return json(200, url.searchParams.has('id') ? await gymSession(root, url.searchParams.get('id')) : await gymOverview(root));
+      if (url.pathname === '/gym/decision') {
+        const session = await gymSession(root, url.searchParams.get('id'));
+        res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment; filename="decision.md"');
+        res.end(decisionMarkdown(session)); return;
+      }
+      if (url.pathname === '/gym/pack') {
+        const pack = await gymPack(root);
+        res.setHeader('Content-Type', 'application/epub+zip');
+        res.setHeader('Content-Disposition', 'attachment; filename="architect-gym-preview.epub"');
+        res.end(pack.bytes); return;
       }
       if (url.pathname === '/api/discovery') return json(200, await discoveryInbox(root));
       if (url.pathname === '/api/reviews') return json(200, await reviewQueue(root));
@@ -69,9 +85,10 @@ export function createSearchServer(root) {
         if (!article) return json(404, { error: 'Article introuvable.' });
         const directory = path.dirname(path.join(root, articlePdfPath(article)));
         if (url.pathname === '/epub') {
-          const content = await fs.readFile(path.join(directory, 'article.epub'));
+          const edition = await epubEdition(root, article, { preview: url.searchParams.get('preview') === '1', download: true });
+          const content = edition.bytes;
           res.setHeader('Content-Type', 'application/epub+zip');
-          res.setHeader('Content-Disposition', 'attachment; filename="article.epub"');
+          res.setHeader('Content-Disposition', `attachment; filename="article-${edition.status}.epub"`);
           res.end(content); return;
         }
         if (url.pathname === '/source') {
@@ -80,9 +97,8 @@ export function createSearchServer(root) {
           res.setHeader('Content-Disposition', 'inline; filename="source.pdf"');
           res.end(await fs.readFile(filename)); return;
         }
-        let epub = false;
-        try { epub = (await fs.stat(path.join(directory, 'article.epub'))).isFile(); } catch (error) { if (error.code !== 'ENOENT') throw error; }
-        return json(200, { ...article, epub, markdown: await fs.readFile(path.join(directory, 'article.md'), 'utf8') });
+        const edition = await epubEdition(root, article);
+        return json(200, { ...article, epub: edition.verified, epub_edition: edition, markdown: await fs.readFile(path.join(directory, 'article.md'), 'utf8') });
       }
       json(404, { error: 'Page introuvable.' });
     } catch (error) {

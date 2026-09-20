@@ -755,3 +755,6 @@ body.reading {
 #discovery-message, #discovery-count { font-size: 12px; color: var(--muted); }
 .discovery-archive { margin: 24px 0; padding: 16px; background: #edf0e3; font-size: 12px; }
 @media(max-width:800px) { .discovery-steps, #discovery-list { grid-template-columns: 1fr; } }
+
+#gym-workspace{max-width:900px;margin:2rem auto}#gym-workspace label{display:block;margin:1rem 0}#gym-workspace textarea{display:block;width:100%;box-sizing:border-box;padding:.8rem;font:inherit;border:1px solid #b6b9b0;border-radius:8px}#gym-evidence{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:#f2f3ee;padding:1rem;max-height:32rem;overflow:auto}#gym-sessions{display:flex;flex-wrap:wrap;gap:1rem}
+#gym-workspace form{display:block;padding:1.25rem}#gym-workspace form label{width:100%}#gym-workspace form button{margin-top:.5rem}#gym-readings li{margin:.6rem 0}#gym-readings button{margin-left:.6rem}

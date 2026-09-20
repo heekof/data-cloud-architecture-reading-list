@@ -1,10 +1,11 @@
+import { reviewQueue, createReviewWriter } from '../src/library-workbench.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { unzipSync, strFromU8 } from 'fflate';
-import { buildEpub, generateEpubs } from '../src/epub.mjs';
+import { buildEpub, generateEpubs, epubEdition } from '../src/epub.mjs';
 import { createSearchServer } from '../src/search-server.mjs';
 const article = { id: 'sample', title: 'A & B', category: 'test', url: 'https://example.org/article?a=1&b=2' };
 async function fixture(t) {
@@ -70,10 +71,35 @@ test('article reader advertises EPUB and download route serves only known articl
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(() => { server.closeAllConnections(); return new Promise(resolve => server.close(resolve)); });
   const base = `http://127.0.0.1:${server.address().port}`;
-  assert.equal((await (await fetch(base + '/api/article?id=sample')).json()).epub, true);
-  const file = await fetch(base + '/epub?id=sample');
+  assert.equal((await (await fetch(base + '/api/article?id=sample')).json()).epub, false);
+  assert.equal((await fetch(base + '/epub?id=sample')).status, 409);
+  const file = await fetch(base + '/epub?id=sample&preview=1');
   assert.equal(file.headers.get('content-type'), 'application/epub+zip');
   assert.match(file.headers.get('content-disposition'), /attachment/);
-  assert.equal((await fetch(base + '/epub?id=missing')).status, 404);
+  assert.equal((await fetch(base + '/epub?id=missing')).status, 409);
   assert.equal((await fetch(base + '/epub?id=../../articles.yaml')).status, 404);
+});
+
+
+test('EPUB downloads require current reviewed bytes; previews warn, rejected and missing text block', async t => {
+  const { root, directory } = await fixture(t);
+  const save = createReviewWriter(root);
+  let row = (await reviewQueue(root)).rows.find(r => r.id === 'sample');
+  await save({ id: 'sample', version: row.version, status: 'approved', notes: 'Checked.' });
+  await generateEpubs(root, { log: () => {} });
+  assert.equal((await epubEdition(root, article)).verified, true);
+  const original = await fs.readFile(path.join(directory, 'article.epub'));
+  await fs.appendFile(path.join(directory, 'source.pdf'), 'changed');
+  await assert.rejects(epubEdition(root, article, { download: true }), e => e.status === 409);
+  const preview = await epubEdition(root, article, { preview: true, download: true });
+  assert.match(strFromU8(unzipSync(preview.bytes)['EPUB/article.xhtml']), /Unverified preview/);
+  await fs.writeFile(path.join(directory, 'article.md'), '');
+  await generateEpubs(root, { log: () => {} });
+  assert.deepEqual(await fs.readFile(path.join(directory, 'article.epub')), original);
+  await assert.rejects(epubEdition(root, article, { preview: true, download: true }), e => e.status === 409);
+  await fs.writeFile(path.join(directory, 'article.md'), 'Restored text.');
+  row = (await reviewQueue(root)).rows.find(r => r.id === 'sample');
+  await save({ id: 'sample', version: row.version, status: 'rejected', notes: 'Incomplete.' });
+  await assert.rejects(epubEdition(root, article, { preview: true, download: true }), e => e.status === 409);
+  assert.deepEqual(await fs.readFile(path.join(directory, 'article.epub')), original);
 });

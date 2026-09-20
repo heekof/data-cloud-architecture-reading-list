@@ -76,12 +76,13 @@ test('quality decisions survive synchronization and approval never masks a missi
     metadata.quality_review = { status: 'approved', notes: 'Compared with complete source.' };
     await fs.writeFile(metadataPath, YAML.stringify(metadata));
     await syncMetadata(root, [article]);
-    assert.equal(YAML.parse(await fs.readFile(metadataPath, 'utf8')).quality.status, 'ok');
+    assert.equal(YAML.parse(await fs.readFile(metadataPath, 'utf8')).quality.status, 'needs_review');
     await fs.unlink(path.join(directory, 'article.md'));
     await syncMetadata(root, [article]);
     metadata = YAML.parse(await fs.readFile(metadataPath, 'utf8'));
     assert.equal(metadata.quality.status, 'needs_review');
-    assert.deepEqual(metadata.quality.issues, ['missing_markdown']);
-    assert.equal(metadata.quality_review.status, 'approved');
+    assert.deepEqual(metadata.quality.issues, ['missing_markdown', 'review_stale']);
+    assert.equal(metadata.quality_review.status, 'pending');
+    assert.equal(metadata.quality_review.history[0].status, 'approved');
   } finally { await fs.rm(root, { recursive: true, force: true }); }
 });

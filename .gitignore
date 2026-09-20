@@ -7,3 +7,6 @@ pipeline.log
 
 # Derived local full-text index
 .search/
+
+# Personal learning decisions (explicitly share only when intended)
+gym/sessions/

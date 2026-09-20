@@ -1,6 +1,6 @@
 const contextSelection = new Map();
 let reviewRows = [], exportResult = null, contextGeneration = 0;
-const issueLabels = { missing_source: 'Source manquante', missing_markdown: 'Texte à extraire', empty_markdown: 'Texte vide', review_rejected: 'Source rejetée' };
+const issueLabels = { review_stale: 'Contenu modifié : nouvelle revue requise', missing_source: 'Source manquante', missing_markdown: 'Texte à extraire', empty_markdown: 'Texte vide', review_rejected: 'Source rejetée' };
 async function postAction(url, body) {
   const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Library-Action': '1' }, body: JSON.stringify(body) });
   const data = await response.json();
@@ -72,7 +72,7 @@ function renderReviews() {
     const select = element('select');
     for (const [value, text] of [['pending', 'À revoir'], ['approved', 'Valider'], ['rejected', 'Rejeter']]) {
       const option = element('option', '', text); option.value = value;
-      if (value === 'approved' && row.issues.some(issue => issue !== 'review_rejected')) option.disabled = true;
+      if (value === 'approved' && row.issues.some(issue => !['review_rejected', 'review_stale'].includes(issue))) option.disabled = true;
       select.append(option);
     }
     select.value = row.review; statusLabel.append(select);
@@ -108,6 +108,8 @@ function initWorkbench() {
   for (const button of document.querySelectorAll('[data-view]')) button.addEventListener('click', () => {
     const view = button.dataset.view;
     $('search-section').hidden = view !== 'search'; $('search-workspace').hidden = view !== 'search';
+    $('gym-workspace').hidden = view !== 'gym';
+    if (view === 'gym') loadGym();
     $('review-workspace').hidden = view !== 'reviews'; $('discovery-workspace').hidden = view !== 'discovery';
     for (const tab of document.querySelectorAll('[data-view]')) tab.setAttribute('aria-pressed', String(tab === button));
     if (view === 'reviews') loadReviews();

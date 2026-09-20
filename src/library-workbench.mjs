@@ -3,33 +3,18 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import YAML from 'yaml';
 import { readConfiguration, articlePdfPath, countWords, syncMetadata } from './article-library.mjs';
+import { inspectContent } from './content-quality.mjs';
 import { writeArticleReport } from './article-report.mjs';
 import { indexCorpus, sqlite } from './search-index.mjs';
 
 const hash = text => crypto.createHash('sha256').update(text).digest('hex');
 const fail = (status, message) => Object.assign(new Error(message), { status });
 const singleLine = text => String(text ?? '').replace(/[\r\n]/g, ' ').replace(/[\\`*_[\]<>#]/g, '\\$&');
-async function optionalText(filename) {
-  try { return await fs.readFile(filename, 'utf8'); }
-  catch (error) { if (error.code === 'ENOENT') return null; throw error; }
-}
 async function inspect(root, article) {
   const directory = path.dirname(path.join(root, articlePdfPath(article)));
-  const raw = await optionalText(path.join(directory, 'metadata.yaml'));
-  const markdown = await optionalText(path.join(directory, 'article.md'));
-  const metadata = raw ? YAML.parse(raw) || {} : {};
-  let sources = [];
-  try { sources = (await fs.readdir(directory, { withFileTypes: true })).filter(e => e.isFile() && /^source\./.test(e.name)).map(e => e.name); }
-  catch (error) { if (error.code !== 'ENOENT') throw error; }
-  const review = metadata.quality_review || { status: 'pending', notes: null };
-  const wordCount = markdown === null ? null : countWords(markdown);
-  const issues = [];
-  if (!sources.length) issues.push('missing_source');
-  if (markdown === null) issues.push('missing_markdown');
-  else if (!wordCount) issues.push('empty_markdown');
-  if (review.status === 'rejected') issues.push('review_rejected');
-  const quality = issues.length ? 'needs_review' : review.status === 'approved' ? 'ok' : 'not_reviewed';
-  return { directory, raw, markdown, metadata, row: { ...article, word_count: wordCount, pdf: Number(sources.includes('source.pdf')), sources, review: review.status, notes: review.notes || '', quality, issues, version: hash(JSON.stringify([raw, markdown, sources])) } };
+  const current = await inspectContent(directory);
+  const { sources, review, wordCount, quality, version } = current;
+  return { ...current, row: { ...article, word_count: wordCount, pdf: Number(sources.includes('source.pdf')), sources, review: review.status, notes: review.notes || '', quality: quality.status, issues: quality.issues, version } };
 }
 export async function reviewQueue(root) {
   const articles = await readConfiguration(root);
@@ -57,8 +42,8 @@ async function saveReview(root, body) {
   if (!article) throw fail(404, 'Article introuvable.');
   const current = await inspect(root, article);
   if (current.row.version !== body.version) throw fail(409, 'Cet article a changé depuis son ouverture. Rechargez la file avant de réessayer.');
-  if (body.status === 'approved' && current.row.issues.some(issue => issue !== 'review_rejected')) throw fail(409, 'Ajoutez une source et un texte non vide avant de valider cet article.');
-  const content = YAML.stringify({ ...current.metadata, ...article, quality_review: { status: body.status, notes: body.notes.trim() || null } });
+  if (body.status === 'approved' && current.row.issues.some(issue => !['review_rejected', 'review_stale'].includes(issue))) throw fail(409, 'Ajoutez une source et un texte non vide avant de valider cet article.');
+  const content = YAML.stringify({ ...current.metadata, ...article, quality_review: { status: body.status, notes: body.notes.trim() || null, reviewed_source_hash: current.source_hash, reviewed_markdown_hash: current.markdown_hash, reviewed_at: new Date().toISOString(), history: [...(current.review.history || []), ...(['approved', 'rejected'].includes(current.review.status) ? [Object.fromEntries(Object.entries(current.review).filter(([key]) => key !== 'history'))] : [])] } });
   await fs.mkdir(current.directory, { recursive: true });
   const temporary = path.join(current.directory, `.metadata-${crypto.randomUUID()}.tmp`);
   try {

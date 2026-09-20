@@ -2,14 +2,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawn } from 'node:child_process';
-import YAML from 'yaml';
+import { inspectContent } from './content-quality.mjs';
 import { readConfiguration, articlePdfPath, countWords } from './article-library.mjs';
 
 const indexPath = root => path.join(root, '.search', 'corpus.sqlite');
 const sql = value => value == null ? 'NULL' : `'${String(value).replaceAll("'", "''").replaceAll('\0', '')}'`;
 const passageWords = 50;
 // Include the chunking configuration so existing indexes rebuild after a change.
-const indexVersion = `line-passages-v2:${passageWords}`;
+const indexVersion = `document-and-passages-v3:${passageWords}`;
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 const schema = `
 CREATE TABLE IF NOT EXISTS articles (
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS passages (
  end_line INTEGER NOT NULL, heading TEXT NOT NULL, body TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS passages_article ON passages(article_id);
+CREATE VIRTUAL TABLE IF NOT EXISTS document_fts USING fts5(article_id UNINDEXED, title, body, tokenize='unicode61 remove_diacritics 2');
 CREATE VIRTUAL TABLE IF NOT EXISTS passage_fts USING fts5(
  title, body, tokenize='unicode61 remove_diacritics 2'
 );
@@ -77,7 +78,7 @@ export async function indexCorpus(root) {
   const statements = ['BEGIN IMMEDIATE;'];
   let updated = 0, removed = 0, unchanged = 0;
   const drop = id => {
-    statements.push(`DELETE FROM passage_fts WHERE rowid IN (SELECT id FROM passages WHERE article_id=${sql(id)});`, `DELETE FROM passages WHERE article_id=${sql(id)};`, `DELETE FROM articles WHERE id=${sql(id)};`);
+    statements.push(`DELETE FROM document_fts WHERE article_id=${sql(id)};`, `DELETE FROM passage_fts WHERE rowid IN (SELECT id FROM passages WHERE article_id=${sql(id)});`, `DELETE FROM passages WHERE article_id=${sql(id)};`, `DELETE FROM articles WHERE id=${sql(id)};`);
   };
   for (const article of articles) {
     const directory = path.join(root, path.dirname(articlePdfPath(article)));
@@ -85,19 +86,16 @@ export async function indexCorpus(root) {
     try { markdown = await fs.readFile(path.join(directory, 'article.md'), 'utf8'); }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
     if (markdown === undefined) { if (existing.has(article.id)) { drop(article.id); removed++; } existing.delete(article.id); continue; }
-    let metadata = {};
-    try { metadata = YAML.parse(await fs.readFile(path.join(directory, 'metadata.yaml'), 'utf8')) || {}; }
-    catch (error) { if (error.code !== 'ENOENT') throw error; }
-    let pdf = false;
-    try { pdf = (await fs.stat(path.join(directory, 'source.pdf'))).isFile(); }
-    catch (error) { if (error.code !== 'ENOENT') throw error; }
-    const review = metadata.quality_review?.status || 'pending';
-    const quality = metadata.quality?.status || 'not_reviewed';
-    const fields = { id: article.id, title: article.title, category: article.category, rating: typeof article.rating === 'number' ? article.rating : null, quality, review, notes: metadata.quality_review?.notes || null, word_count: countWords(markdown), pdf: Number(pdf), url: article.url };
-    const fingerprint = digest(indexVersion + '\n' + JSON.stringify(fields) + '\n' + markdown);
+    const current = await inspectContent(directory);
+    const review = current.review.status;
+    const quality = current.quality.status;
+    const pdf = current.sources.includes('source.pdf');
+    const fields = { id: article.id, title: article.title, category: article.category, rating: typeof article.rating === 'number' ? article.rating : null, quality, review, notes: current.review.notes || null, word_count: countWords(markdown), pdf: Number(pdf), url: article.url };
+    const fingerprint = digest(indexVersion + '\n' + JSON.stringify(fields) + '\n' + current.source_hash + '\n' + markdown);
     if (existing.get(article.id) === fingerprint) { unchanged++; existing.delete(article.id); continue; }
     drop(article.id);
     statements.push(`INSERT INTO articles (id,title,category,rating,quality,review,notes,word_count,pdf,url,fingerprint) VALUES (${Object.values(fields).map(sql).join(',')},${sql(fingerprint)});`);
+    statements.push(`INSERT INTO document_fts(article_id,title,body) VALUES (${sql(article.id)},${sql(article.title)},${sql(markdown)});`);
     for (const chunk of chunkMarkdown(markdown)) {
       statements.push(`INSERT INTO passages (article_id,start_line,end_line,heading,body) VALUES (${sql(article.id)},${chunk.start_line},${chunk.end_line},${sql(chunk.heading)},${sql(chunk.body)});`);
       statements.push(`INSERT INTO passage_fts (rowid,title,body) VALUES (last_insert_rowid(),${sql(article.title)},${sql(chunk.body)});`);
@@ -124,6 +122,7 @@ export function matchExpression(query) {
 
 export async function searchCorpus(root, { query = '', category = '', minRating = '', quality = '', includeRejected = false, page = 1 } = {}) {
   if (query.length > 300) throw new Error('La recherche est limitée à 300 caractères.');
+  await indexCorpus(root);
   const clauses = [];
   if (!includeRejected) clauses.push("a.review != 'rejected'");
   if (category) clauses.push(`a.category=${sql(category)}`);
@@ -134,6 +133,7 @@ export async function searchCorpus(root, { query = '', category = '', minRating 
   }
   if (quality) clauses.push(`a.quality=${sql(quality)}`);
   const expression = matchExpression(query);
+  const passageExpression = (query.match(/[\p{L}\p{N}]+/gu) || []).slice(0, 64).map(token => `"${token}"`).join(' OR ');
   const filtered = clauses.length ? clauses.join(' AND ') : '1';
   const currentPage = Math.max(1, Math.min(10000, Math.trunc(Number(page)) || 1));
   const size = 12, offset = (currentPage - 1) * size;
@@ -142,7 +142,8 @@ export async function searchCorpus(root, { query = '', category = '', minRating 
     SELECT p.*, bm25(passage_fts,4.0,1.0) AS score,
     snippet(passage_fts,1,char(1),char(2),' … ',44) AS excerpt
     FROM passage_fts JOIN passages p ON p.id=passage_fts.rowid
-    WHERE passage_fts MATCH ${sql(expression)}
+    WHERE passage_fts MATCH ${sql(passageExpression)}
+    AND p.article_id IN (SELECT article_id FROM document_fts WHERE document_fts MATCH ${sql(expression)})
   ), selected AS (
     SELECT h.*, row_number() OVER(PARTITION BY h.article_id ORDER BY h.score,h.id) AS position,
     count(*) OVER(PARTITION BY h.article_id) AS matches FROM hits h

@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import http from 'node:http';
 import YAML from 'yaml';
+import { syncMetadata, readConfiguration } from '../src/article-library.mjs';
 import { indexCorpus, searchCorpus, chunkMarkdown } from '../src/search-index.mjs';
 import { reviewQueue, createReviewWriter, exportContext } from '../src/library-workbench.mjs';
 import { createSearchServer } from '../src/search-server.mjs';
@@ -46,7 +47,7 @@ test('search groups passages, matches phrases and accents, filters metadata and 
   assert.equal((await searchCorpus(root, { query: 'cafe' })).results[0].id, 'gamma');
   assert.equal((await searchCorpus(root, { category: 'data' })).total, 1);
   assert.equal((await searchCorpus(root, { minRating: '8' })).results[0].id, 'alpha');
-  assert.equal((await searchCorpus(root, { quality: 'needs_review', includeRejected: true })).results[0].id, 'beta');
+  assert.ok((await searchCorpus(root, { quality: 'needs_review', includeRejected: true })).results.some(r => r.id === 'beta'));
   assert.equal((await searchCorpus(root, { query: "' OR 1=1; DROP TABLE articles; --" })).total, 0);
   assert.equal((await searchCorpus(root, { query: '***' })).total, 0);
   assert.equal((await searchCorpus(root)).total, 2);
@@ -66,8 +67,8 @@ test('index updates changed text and metadata, removes unavailable articles, pre
   assert.equal((await searchCorpus(root, { query: 'idempotency' })).total, 0);
   assert.equal((await searchCorpus(root, { query: 'revised' })).total, 1);
   await fs.writeFile(path.join(root, 'articles/alpha/metadata.yaml'), YAML.stringify({ quality: { status: 'ok' }, quality_review: { status: 'approved' } }));
-  assert.equal((await indexCorpus(root)).updated, 1);
-  assert.equal((await searchCorpus(root, { quality: 'ok' })).total, 1);
+  assert.equal((await indexCorpus(root)).updated, 0); // Unbound approval has the same effective state.
+  assert.equal((await searchCorpus(root, { quality: 'ok' })).total, 0);
   await fs.unlink(source);
   assert.equal((await indexCorpus(root)).removed, 1);
   assert.equal((await searchCorpus(root, { query: 'revised' })).total, 0);
@@ -199,4 +200,46 @@ test('review and export endpoints require same-origin JSON actions and reject ma
   assert.equal((await fetch(base + '/api/review', { method: 'POST', headers, body: '{' })).status, 400);
   assert.equal((await fetch(base + '/api/context', { method: 'POST', headers, body: '{}' })).status, 400);
   assert.equal((await fetch(base + '/api/context', { method: 'POST', headers, body: 'x'.repeat(33000) })).status, 413);
+});
+
+
+test('document retrieval joins concepts across sections and retains precise evidence offsets', async t => {
+  const root = await fixture(t);
+  const markdown = '# Catalog\n\nCatalog design.\n\n## Governance\n\nGovernance responsibilities.\n';
+  await fs.writeFile(path.join(root, 'articles/alpha/article.md'), markdown);
+  const results = await searchCorpus(root, { query: 'catalog governance' });
+  assert.equal(results.total, 1);
+  const hit = results.results[0];
+  assert.equal(hit.id, 'alpha'); assert.equal(hit.matches, 2);
+  const exported = await exportContext(root, { items: [{ id: hit.id, passage_id: hit.passage_id, revision: hit.revision }], mode: 'passages', question: '', maxWords: 100 });
+  assert.ok(exported.markdown.includes(markdown.split('\n').slice(hit.start_line - 1, hit.end_line).join('\n').trim()));
+  assert.equal((await searchCorpus(root, { query: 'catalog nonexistent' })).total, 0);
+});
+
+test('approvals bind bytes, metadata-only edits stay approved, stale forms reject replaced PDFs', async t => {
+  const root = await fixture(t), save = createReviewWriter(root);
+  const directory = path.join(root, 'articles/alpha');
+  await fs.writeFile(path.join(directory, 'source.pdf'), 'first PDF');
+  let row = (await reviewQueue(root)).rows.find(r => r.id === 'alpha');
+  await fs.writeFile(path.join(directory, 'source.pdf'), 'replacement PDF');
+  await assert.rejects(save({ id: 'alpha', version: row.version, status: 'approved', notes: '' }), e => e.status === 409);
+  row = (await reviewQueue(root)).rows.find(r => r.id === 'alpha');
+  await save({ id: 'alpha', version: row.version, status: 'approved', notes: 'Compared source and extraction.' });
+  const filename = path.join(directory, 'metadata.yaml');
+  let metadata = YAML.parse(await fs.readFile(filename, 'utf8'));
+  assert.match(metadata.quality_review.reviewed_source_hash, /^[a-f0-9]{64}$/);
+  metadata.rating = 1; await fs.writeFile(filename, YAML.stringify(metadata));
+  assert.equal((await reviewQueue(root)).rows.find(r => r.id === 'alpha').quality, 'ok');
+  await fs.writeFile(path.join(directory, 'source.pdf'), 'another PDF');
+  assert.equal((await searchCorpus(root, { quality: 'ok' })).total, 0);
+  await syncMetadata(root, await readConfiguration(root));
+  metadata = YAML.parse(await fs.readFile(filename, 'utf8'));
+  assert.equal(metadata.quality_review.status, 'pending');
+  assert.equal(metadata.quality_review.history.length, 1);
+  await syncMetadata(root, await readConfiguration(root));
+  assert.equal(YAML.parse(await fs.readFile(filename, 'utf8')).quality_review.history.length, 1);
+  row = (await reviewQueue(root)).rows.find(r => r.id === 'alpha');
+  await save({ id: 'alpha', version: row.version, status: 'approved', notes: 'Rechecked.' });
+  await fs.appendFile(path.join(directory, 'article.md'), '\nnew section');
+  assert.equal((await reviewQueue(root)).rows.find(r => r.id === 'alpha').review, 'pending');
 });

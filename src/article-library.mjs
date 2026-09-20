@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import YAML from "yaml";
+import { inspectContent } from "./content-quality.mjs";
 
 export function sanitizeSegment(value) {
   return String(value)
@@ -70,29 +71,7 @@ export async function syncMetadata(root, articles) {
   for (const article of articles) {
     const directory = path.dirname(path.join(root, articlePdfPath(article)));
     const filename = path.join(directory, "metadata.yaml");
-    let wordCount = null;
-    try { wordCount = countWords(await fs.readFile(path.join(directory, "article.md"), "utf8")); }
-    catch (error) { if (error.code !== "ENOENT") throw error; }
-    let previous;
-    try { previous = await fs.readFile(filename, "utf8"); }
-    catch (error) { if (error.code !== "ENOENT") throw error; }
-    // Keep the human decision separate from regenerated index fields and checks.
-    const review = (previous ? YAML.parse(previous)?.quality_review : null) || { status: "pending", notes: null };
-    if (!["pending", "approved", "rejected"].includes(review.status) ||
-        (review.notes != null && typeof review.notes !== "string")) {
-      throw new Error(`Invalid quality_review in ${filename}; use pending, approved, or rejected and text notes.`);
-    }
-    let sources = [];
-    try {
-      sources = (await fs.readdir(directory, { withFileTypes: true }))
-        .filter(entry => entry.isFile() && /^source\./.test(entry.name));
-    } catch (error) { if (error.code !== "ENOENT") throw error; }
-    const issues = [];
-    if (!sources.length) issues.push("missing_source");
-    if (wordCount === null) issues.push("missing_markdown");
-    else if (wordCount === 0) issues.push("empty_markdown");
-    if (review.status === "rejected") issues.push("review_rejected");
-    const quality = { status: issues.length ? "needs_review" : review.status === "approved" ? "ok" : "not_reviewed", issues };
+    const { wordCount, raw: previous, review, quality } = await inspectContent(directory);
     qualityRows.push({ article, quality, review, wordCount });
     const content = YAML.stringify({ ...article, word_count: wordCount, quality, quality_review: review });
     if (previous === content) continue;
