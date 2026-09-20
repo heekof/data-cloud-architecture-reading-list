@@ -50,7 +50,7 @@ Markdown SHA-256: adf145ef1b39f80a0c52fbc487281cad6cbb6f6053b0bd94d64d90180b68b9
 > pipelines rather than delegating to individual administrators.
 > If you use a metastore admin, it is strongly recommended to assign the role to a designated
 > group instead of a single user.
-> 
+>
 > Isolation mechanisms
 > To support enterprise-grade segregation for security or organizational reasons, Unity Catalog
 > supports isolation on several levels:
@@ -82,7 +82,7 @@ Markdown SHA-256: 91c476686454971ab89f3d6cfc8c5a7f1676b06e850fe92eeb4e7e400b9f37
 > This is particularly important to ensure that the data products meet a minimum
 > governance standard which in turn is crucial for their interoperability and the network
 > effects that data mesh promises.
-> 
+>
 > Data product as an architectural quantum of the
 
 ### [S3] Design Unity Catalog Architecture
@@ -110,7 +110,7 @@ Markdown SHA-256: adf145ef1b39f80a0c52fbc487281cad6cbb6f6053b0bd94d64d90180b68b9
 > Grant privileges to groups rather than individual users for easier management.
 > Use least-privilege access (grant only the minimum permissions required).
 > Document access control policies and review regularly with security teams.
-> 
+>
 > https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/deployment-guide/unity-catalog
 
 ## My critique
